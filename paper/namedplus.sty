@@ -1,0 +1,92 @@
+% This is a slightly modified version of the namedplus style, which fully conforms
+% with the Journal of Neuroscience citation style.
+% Last modified 2004 April 06 by Matthias Hennig (hennig@cn.stir.ac.uk)
+%
+% version = 1.00 of namedplus.sty 2000 April 12
+%
+% Journal of Neuroscience and other similar (apalike, but different) styles.
+% They use parens around citations and allow four types of citation macros:
+% \cite, \citeauthor, \citeyear, \citenoparens, and \citetext \citenoparens
+% gives you the standard Darwin, 1873 with no parentheses so you can do stuff
+% like (see \citenoparens{darwin1873}).  \citetext gives you Darwin (1873).
+%
+% The output comes out as a full list of authors (year) and then
+% the standard rest of the stuff.  I've used it for Journal of Neuroscience,
+% Hippocampus, and other similar journals.
+%
+% adr
+% -----------------------------------------------------
+% A. David Redish               adr@nsma.arizona.edu
+% Post-doc              http://www.cs.cmu.edu/~dredish
+% Neural Systems, Memory and Aging, Univ of AZ, Tucson AZ
+% -----------------------------------------------------
+
+% This file implements citations for the ``namedplus'' bibliography style.
+%  Place it in a file called namedplus.sty in the TeX search path.  (Placing it
+% in the same directory as the LaTeX document should also work.)
+
+% The ``named'' bibliography style creates citations with labels like
+%	\citeauthoryear{author-info}{year}
+% these labels are processed by the following commands:
+%	\cite{key}
+%		which produces citations with both author and year,
+%		enclosed in parens.
+%	\shortcite{key}
+%		which produces citations with year only,
+%		enclosed in parens
+%	\citeauthor{key}
+%		which produces the author information only
+%	\citeyear{key}
+%		which produces the year information only
+%	\citetext{key}
+%		which produces Author (Year)
+%	\citenoparens{key}
+%		which produces Author, Year
+
+% ADR 15 May 1997 Changed citetext to have ~ between the author and year.
+
+% Use parens instead of brackets for \cite, and no label in the bibliography
+%
+\def\@biblabel#1{}
+
+\let\@internalcite\cite
+
+\def\cite{\def\@citeseppen{-1000}%
+ \def\@cite##1##2{(\nobreak\hskip 0in{##1\if@tempswa , ##2\fi})}%
+ \def\citeauthoryear##1##2{##1, ##2}\@internalcite}
+
+\def\citetext{\def\@citeseppen{-1000}%
+ \def\@cite##1##2{\nobreak\hskip 0in{##1\if@tempswa , ##2\fi}}%
+ \def\citeauthoryear##1##2{##1~(##2)}\@internalcite}
+
+\def\citenoparens{\def\@citeseppen{-1000}%
+ \def\@cite##1##2{\nobreak\hskip 0in{##1\if@tempswa , ##2\fi}}%
+ \def\citeauthoryear##1##2{##1, ##2}\@internalcite}
+
+\def\shortcite{\def\@citeseppen{1000}%
+ \def\@cite##1##2{({##1\if@tempswa , ##2\fi})}%
+ \def\citeauthoryear##1##2{##2}\@internalcite}
+
+\def\citeauthor#1{\def\@cite##1##2{{##1\if@tempswa , ##2\fi}}%
+ \def\citeauthoryear##1##2{##1}\@citedata{#1}}
+
+\def\citeyear#1{\def\@cite##1##2{{##1\if@tempswa , ##2\fi}}%
+ \def\citeauthoryear##1##2{##2}\@citedata{#1}}
+
+\def\@citedata#1{\@tempswafalse%
+ \if@filesw\immediate\write\@auxout{\string\citation{#1}}\fi
+  \def\@citea{}\@cite{\@for\@citeb:=#1\do
+    {\@citea\def\@citea{;\penalty\@citeseppen\ }\@ifundefined
+       {b@\@citeb}{{\bf ?}\@warning
+       {Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{}}
+
+% don't box citations, separate with ; and a space
+% also, make the penalty between citations negative: a good place to break
+\def\@citex[#1]#2{\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi
+  \def\@citea{}\@cite{\@for\@citeb:=#2\do
+    {\@citea\def\@citea{;\penalty\@citeseppen\ }\@ifundefined
+       {b@\@citeb}{{\bf ?}\@warning
+       {Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{#1}}
+
