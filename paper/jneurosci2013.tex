@@ -1,4 +1,3 @@
-%\documentclass[twocolumn]{article}
 \documentclass[12pt]{article}
 % Change "article" to "report" to get rid of page number on title page
 \usepackage{amsmath,amsfonts,amsthm,amssymb}
@@ -29,52 +28,12 @@
 
 \pagestyle{empty}
 
-\newcommand{\framedscalefigone}[3]{
-  \begin{figure}[ht!]
-    % Requires \usepackage{graphicx}
-    \centering
-    \begin{framed}
-      \begin{minipage}{\textwidth}
-        \centering
-        \includegraphics[width=#2\columnwidth]{#1}
-        \caption{#3}
-        \label{#1}
-      \end{minipage}
-    \end{framed}
-  \end{figure}}
-
-\newcommand{\framedscalefigtwo}[4]{
-  \begin{figure}[ht!]
-    % Requires \usepackage{graphicx}
-    \centering
-    \begin{framed}
-      \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=#3\columnwidth]{#1}
-      \end{minipage}
-      \begin{minipage}{0.49\textwidth}
-        \includegraphics[width=#3\columnwidth]{#2}
-      \end{minipage}
-      \caption{#4}
-      \label{#1}
-    \end{framed}
-  \end{figure}}
-
 \newcommand{\scalefigone}[3]{
   \begin{figure}[ht!]
     % Requires \usepackage{graphicx}
     \centering
     \includegraphics[width=#2\columnwidth]{#1}
     \caption{#3}
-    \label{#1}
-  \end{figure}}
-
-\newcommand{\scalefigtwo}[4]{
-  \begin{figure}[ht!]
-    % Requires \usepackage{graphicx}
-    \centering
-    \includegraphics[width=#3\columnwidth]{#1}
-    \includegraphics[width=#3\columnwidth]{#2}
-    \caption{#4}
     \label{#1}
   \end{figure}}
 
@@ -91,8 +50,8 @@
 \begin{document}
 
 \begin{center} \begin{Large}
-  \textbf{A spiking neural circuit model of cortical function
-          in simple reaction time tasks}
+  \textbf{A task-state model of medial PFC \\ can perform top-down
+    control}
 \end{Large} \end{center}
 
 \begin{center}
@@ -101,165 +60,505 @@
 \end{center}
 
 \begin{abstract}
-  todo
+  Many hypotheses on the function of medial prefrontal cortex (mPFC)
+  have been put forth,
+  including action-outcome learning, ???More.
+  We adopt a more general approach and posit that
+  the mPFC tracks task state,
+  which can be usd to accomplish previously hypothesized functions.
+  We use as a model rodents performing a simple reaction time (RT) task.
+  First, we show that mPFC activity
+  tracks task state in the simple RT task,
+  and that neural integration is a core mechanism
+  for accomplishing task state tracking.
+  Second, we show that a working memory model
+  using neural integrators closely matches
+  rodent neural activity.
+  Finally, we propose a neural circuit model
+  that imposes top-down control on a control system
+  as a proof-of-concept that the task-state model
+  can explain the myriad of functions ascribed
+  to the medial PFC.
 \end{abstract}
 
 \section{Introduction}
 
-Animals make complicated motor actions
-with high spatial and temporal resolutions.
-In temporally precise tasks,
-the motor cortex and several afferents coordinate
-to bring about motor actions at appropriate times.
-For tasks with delay periods,
-the medial prefrontal cortex is critically important
-for suppressing motor action during the delay period.
-This effect has been seen in ?.  %???primates humans rodents etc???.
+mPFC function background
 
-In rodents, the role of the medial prefrontal cortex
-has been investigated through ?.
-%???previous work???.
-Previously, we have used a simple reaction task
-and principal component analysis
-to investigate ?. %???summarize Narayana \& laubach jnp 2009???
-These results point to neural integration
-as playing a key role
-in the mPFC's ability
-to control the timing of motor actions.
+mPFC models background
 
-In order to investigate the neural circuit
-underlying the production and suppression of motor output,
-we extend Singh \& Eliasmith's model to include
-neural populations that directly affect the environment,
-analogous to the function of Betz cells.
-In doing so, we can relate the model to the experimental data
-in both neural and behavioural contexts.
+We propose that the function of the mPFC is to
+track task states.
+These task states can be very high-dimensional,
+if, for example, visual features are necessary
+for performing a particular task.
+The other functions that have been ascribed
+to the mPFC are accomplished
+by other areas, but use the task state
+information in the mPFC to perform their function.
 
-\section{Model}
+As an application of this theory,
+we investigate a simple reaction-time task.
+The remainder of the paper is organized as follows.
+First, we review experimental data from rodents
+doing the reaction-time task.
+The task state space being tracked is determined
+by a dimensionality reduction technique
+(principal component analysis).
+Second, we review a spiking neural model
+of working memory and
+analyze it during the simple reaction-time task.
+Third, we analyze the two-dimensional dynamical system
+that makes up the task state space and
+show how it changes as a result of performing the task.
+Fourth, we create a neural control system
+that can perform the simple reaction-time task
+and show how the mPFC model can exert top-down control
+on that control system.
+Finally, we give some examples of how the model
+can be manipulated in order to predict
+neural and behavioural effects in certain pathologies.
 
-The model presented in this study
-is based on a conceptual model of PFC and MC
-function in delay tasks proposed by Narayanan and Laubach.
-Their conceptual model is based on
-principal component analysis of neural data
-in rats performing a simple reaction time task.
+\section{Experimental data}
 
-Figure 1 summarizes their PC analysis.
-In PFC, two components account for over 35\%
-of variance in population firing.
-The first principal component increases slightly
-at the time of the lever press,
-and then decreases over the delay period.
-The second principal component
-also increases at the time of lever press,
-but remains high until the time of release.
+Narayanan \& Laubach (2009) recorded the medial PFC
+of rodents performing a simple reaction-time task
+(figure ???).
+In this task, the subject presses and holds down the lever
+for a delay (the ``foreperiod'';
+1 second for the data in this study).
+After the foreperiod, an auditory tone (stimulus) is played.
+The subject then has 0.6 seconds (the response window)
+in which to release the lever.
+If the lever is released in that time,
+the subject is rewarded.
+If the lever is released during the foreperiod,
+it is called a premature error,
+and is penalized by a time-out.
+If the lever is not released within the response window,
+it is called a late error,
+and is also penalized by a time-out.
 
-In motor cortex, three components account
-for over 60\% of variance in population firing.
-The first two principal components are
-similar to those found in PFC;
-the first steadily decreases over the delay period,
-and the second remains high during the delay period.
-The third principal component increases
-sharply slightly before lever press
-and lever release.
+Narayanan \& Laubach used principal component analysis
+in order to determine the important signals
+being represented in the mPFC.
+As shown in figure ???,
+the first two principal components were significant,
+and appear to track
+1) if the subject was performing the task, and
+2) the relative amount of time the subject has been
+performing the task.
+Narayanan \& Laubach also found that the neural activity
+in the mPFC changed significantly depending on
+the outcome of the previous trial;
+the first two principal components
+change significantly after errors,
+and appear to contain a trace that an error occurred.
 
-The identification of these principal components
-leads to a conceptual model of cortical function
-during simple reaction time tasks.
-This model is summarized in figure 2. % Fig
+Interestingly, in the post-correct case,
+the first principal components
+is very high correlated with the integral
+of the second principal components,
+and similarly the second principal component
+with the integral of the first.
+In the post-error case,
+these correlations are significantly weaker.
+This result suggests that
+the mPFC is performing some kind of integration.
+
+\section{Coupled neural integrators}
+
+One model of neural integration is
+Singh \& Eliasmith (2006).
+Their model was created to explain working memory activity
+in PFC during a vibrotactile discrimination task.
+It employs two-dimensional neurons in integrative populations
+in order to show time-varying activity during the task.
+Due to the identification of two strong components
+in the rodent data,
+we hypothesized that the Singh \& Eliasmith model
+could be used to model the simple RT task as well.
+
+There are two different realizations
+of this model, as shown in figure ???.
+In one, a single population of adaptive
+leaky integrate-and-fire neurons tracks both
+integrative dimensions, as well as two control dimensions.
+In the other, two coupled populations
+of adaptive leaky integrate-and-fire neurons
+each track one integrative dimension, as well
+as one control dimension.
+The integrative dimensions are projected
+to another population that does not explicitly
+represent the control dimensions.
+In both realizations of the model,
+input to the integrators is provided
+by motor actions, and are controlled
+by the task outcome.
+The idea here is that a motor action
+(in this case a lever press)
+starts the presistent activations
+of one of the integrative dimensions.
+That dimension provides input to the other integrative dimension.
+Task outcomes (in this case either reward
+or time-out penalties) affect the control dimensions,
+either stopping all integration
+in the reward case or
+reversing the integration in the penalty case.
+
+These two different model configurations
+make an important distinction between
+what is being represented in the brain
+area being analyzed.
+In our case, should the single population model
+match the neural data,
+it predicts that the task information
+as well as the action and outcome information
+is being represented in the mPFC.
+If the coupled population model matches
+the neural data,
+it predicts that only the task information
+is being represented, and action and outcome
+information only affects the mPFC's
+task state.
+
+As can be seen in figure ???,
+the coupled integrator model matches
+the neural data closely, while the single population model
+does not.
+In the single population model,
+there is highly modulated activity
+around the time of reward delivery;
+this modulation is not seen in the data.
+Therefore, it can be concluded that,
+at least for the rodent in a simple RT task,
+outcome information is not explicitly
+represented in the mPFC,
+though the outcome does affect the task
+information reflected in mPFC activity.
+We will analyze the coupled integrator
+realization of the Singh \& Eliasmith
+model in the subsequent sections.
+
+\section{Task state space analysis}
+
+If the role of the mPFC is to track the task-state,
+then we can view mPFC activity as a trajectory
+in the task state space.
+This is done in figure ??? for the experimental data,
+and the simulated data.
+
+In the post-correct case,
+the trajectory through task space is cyclical.
+In other words,
+when the subject is performing the task properly,
+the mPFC travels in a predictable loop.
+In the post-error case,
+the trajectory through task space is less predictable.
+
+The dynamics of this task state space
+can be approximated based on these trajectories,
+and on how the Singh \& Eliasmith model was created.
+These dynamics are captured in the following equation.
+
+\begin{equation*}
+  \begin{bmatrix}
+    \dot{x_1} \\ \dot{x_2}
+  \end{bmatrix} = \begin{bmatrix}
+    -\beta R & 0 \\ \alpha & -\beta R
+  \end{bmatrix} \begin{bmatrix}
+    x_1 \\ x_2
+  \end{bmatrix} + \begin{bmatrix}
+    1 & -1 \\ 0 & 0
+  \end{bmatrix} \begin{bmatrix}
+    A \\ P
+  \end{bmatrix} 
+\end{equation*}
+where $A$ is the action (lever press),
+$R$ is the reward, and $P$ is the penalty.
+Figure ??? shows the result of directly simulating
+the trajectory of this dynamical system.
+
+The Singh \& Eliasmith model uses the methods
+of the Neural Engineering Framework (NEF),
+which can simulate arbitrary dynamical systems.
+The dynamical system defines how the model
+encodes information in the populations of neurons,
+and how those encoded values are transformed
+through connections between populations.
+Because we know exactly how the information
+is encoded and transformed, we can also
+decode that information directly;
+this results in figure ???,
+which looks like a noisy version
+of the mathematical model.
+It is important to note that this decoding process
+was done on the same neural data that
+results in the principal components in figure ???;
+therefore, we can say with some certainty
+that the mathematical model is closely emulating
+the experimental mPFC.
+
+\section{Top-down control of motor actions}
+
+Previous work by Laubach and colleagues (and other groups)
+has implicated mPFC as a top-down controller
+on the motor cortex in delay tasks like simple RT.
+Their work suggests that the mPFC directly inhibits
+the motor cortex.
+In this paper, we propose instead that the mPFC
+can either inhibit, directly excite,
+or modulate other activity being projected
+to the motor cortex depending on
+the part of task-state space the mPFC is in.
+
+In order to demonstrate that this is possible,
+we created a simple stimulus-response control system
+using the methods used in Singh \& Eliasmith, 2006
+(i.e., the NEF; see figure ???).
+Briefly, the system is composed of three populations
+of adaptive leaky integrate-and-fire neurons.
+One population presses and releases the lever,
+one population tracks if the lever is currently being held down,
+and one population is sensitive to the auditory stimulus,
+and stimulates release neurons if the lever
+is currently being held down.
+This system is trivial to build,
+and can perform the simple RT task
+with little difficulty (see figure ???).
+
+Top-down control can be accomplished
+because of the predictability with which
+the mPFC traverses the task state space.
+If the subject continues to perform the task correctly,
+the release should happen at the same part
+of the state space (see figure ???);
+if the subject forces a release at the appropriate
+part of the state space, it can, in fact,
+release the lever faster than it would be able to
+if it waits for the stimulus.
+In fact, if the foreperiod is completely
+predictable, then even devoid of a stimulus,
+the subject could perform this task
+solely through a forced release mediated
+by the mPFC.
+
+Through a similar argument, the mPFC
+can also cause the subject to be more
+cue-sensitive after errors occur.
+When an error occurs, the mPFC is driven to a
+low part of the state space.
+When the initial press occurs, it may not
+be driven to the top part of the state space
+as it should; if that occurs (i.e.,
+if the subject is performing this task
+in the wrong part of the state space),
+the subject can attempt to become more cue-sensitive
+(see figure ???).
+
+This top-down control can be exerted
+on the stimulus-response motor control system
+with the network configuration depicted in
+figure ???. Briefly, top-down control
+is mediated by directly stimulating
+the population that is sensitive to the auditory stimulus.
+When the mPFC is in the force-release zone,
+then these neurons will be excited;
+this can either make the population react quicker to
+the stimulus, or can directly cause a release
+even in the absence of a stimulus.
+When the mPFC is in the cue-sensitive zone,
+these neurons are stimulated in such a way that
+they react quicker and stronger to the stimulus,
+but cannot directly cause a release
+in the absence of a stimulus.
+
+\section{Task-state space dynamics and errors}
+
+Looking at the dynamics of the task state space
+at each part of a simple RT task trial
+(figure ???)
+gives a full picture of what the task-state
+theory of mPFC function predicts is occurring
+during the simple RT task.
+
 At the start of a trial,
-two complementary systems are activated
-to produce quick reactions at the time of a stimulus.
-The \textit{prepotent response} system
-prepares the motor action that the subject will perform
-at the end of the delay period.
-The \textit{proactive inhibition} system
-suppresses that motor action until the delay period
-is over.
+the system is driven upwards towards [1.0, 0.0].
+This sets the initial state for the task.
+The subject may have been doing another task
+before initiating this RT task;
+by resetting to the same initial state,
+the subject's behaviour can proceed predictably.
+As will be seen, however, after errors,
+the system may be sufficiently far from this
+initial state that it cannot quite get to the initial state,
+and instead operates in an unpredictable part of the task space.
 
-\subsection{Neural integration as a core mechanism}
+In a correct trial (b), the passive dynamics of the system
+push the state to the right
+at a predictable (i.e., learned) rate.
+The release happens when the state of the system
+is sufficiently far to the right (i.e., $x_1$ is high).
+If this release happens properly, reward is delivered,
+which pushes the system back to the origin.
+Then, in the absence of any task-related dynamics,
+the system will stay approximately at rest
+because the passive dynamics of the system are very weak
+at the origin point.
 
-An important observation of Narayanan and Laubach
-is that the second principal component
-is the cumulative sum (integral)
-of the first principal component.
-This suggests that some neurons in these cortical areas
-are representing the integral of another
-signal represented in these areas.
+A premature error can be caused by some other factor
+(i.e., a motor system mistake) or by the passive dynamics
+of the system being too strong in the part of the state space
+that the system is driven to once the subject presses the lever.
+In the case of some other factor,
+the system will receive the negative outcome feedback
+before reaching the right side of the state-space,
+and be driven to the bottom.
+In the case of fast integration,
+the system will reach the right side of the state-space,
+force a release, and then receive the negative outcome feedback
+and be driven to the bottom.
+The exact state after receiving the negative feedback
+can be used to figure out the cause of the error,
+though after some time in the lower part
+of the state space, the system will be
+driven to the left,
+and all that can be decoded
+is the notion that an error occurred.
 
-Neural integration through recurrently connected
-populations of neurons has been widely studied
-in the context of working memory.
-% ? cite a bunch -- Mawkinson, Roman, Tanji, X-J Wang, look at singh eliasmith biblio
+A late error can be caused by either another factor
+not responding to the top-down control properly or in time,
+by right-ward drift happening too slowly,
+or by the system not being driven
+to the appropriate place upon pressing down the lever
+and drifting slowly as a result.
 
-The Singh and Eliasmith model, in particular,
-facilitates a neural implementation of the conceptual model
-proposed as a result of the PC analysis.
-In addition to outlining a method of constructing
-multidimensional neural integrators,
-it also provides a method of connecting those integrators
-to other populations of neuron representing other signals.
+\section{Behavioural results}
 
-\subsection{Coupled integrators in a control system}
+While there are a number of tunable parameters,
+(e.g., $\alpha$ and $\beta$ from equation ???),
+there are many more parameters that are randomly selected
+from probability distributions.
+Neuron parameters (neuronal gain, encoding vectors,
+adaptation constants, etc.) are all randomized,
+and the results of those randomizations are used
+to solve for appropriate connection weights.
+As such, there is a large amount of variation
+between instances of this model.
+For that reason,
+we generate several instances of the model
+and run the model for over forty trials
+to get an idea of how
+that particular instance of the model behaves.
 
-With non-integrative and integrative neuronal populations
-as the building blocks, we propose a neural circuit
-realization of the conceptual model
-discussed in Narayanan and Laubach.
-The model is summarized in figure 3.
+Figure ??? summarizes the behavioural results
+from the experimental rodents, the stimulus-response model
+alone, and the stimulus-response model with top-down
+control by a coupled integrator model.
+The experimental rodents ???.
+The stimulus-response model by itself has a relatively slow
+reaction time (median ???, $\pm$ ???),
+but very high accuracy (??? correct, ??? late, 0\% early).
+With top-down control, some models were able to achieve
+extremely fast reaction times (e.g., ???).
+On average, however, the median reaction time was
+??? $\pm$ ???. Note that the variance in reactions times
+was much higher with top-down control,
+and the accuracy was in general lower (??? correct, ??? late,
+??? early).
 
-Two populations are hypothesized to reside in motor cortex.
-The \textit{Press/Release} population represents
-whether the subject is currently executing
-a press or release motor action.
-The activity of this population directly affects the environment
-in the model, which can be thought of
-as functioning like Betz cells.
-The \textit{Holding} population tracks
-whether or not the subject is currently holding down the lever.
-It is analogous to the \textit{prepotent response}
-from the conceptual model, as in the absence of inhibition,
-it will activate the \textit{Release} neurons
-in the \textit{Press/Release} population.
-The \textit{Holding} population is integrative,
-and integrates the
-\textit{Press} signal from the \textit{Press/Release}
-population. The integration is controlled
-by the \textit{Release} signal, meaning that
-when the lever is released the \textit{Holding} signal
-is reset to some baseline.
+\section{Model manipulations}
 
-Three populations are hypothesized to reside
-in medial prefrontal cortex.
-The \textit{Waiting} population represents
-that the subject is in a delay state,
-waiting for the appropriate time to perform a motor action.
-It is analogous to the \textit{proactive inhibition}
-from the conceptual model, as it works to balance
-the prepotent release response being signaled
-from the motor cortex's \textit{Holding} population.
-The \textit{Cue} population is sensitive
-to the auditory stimulus delivered to the subject
-when the delay period is over.
-It inhibits the \textit{Waiting} population's
-proactive inhibition, disinhibiting \textit{Release}
-sensitive neurons.
-Similarly, the \textit{Timer} population
-tracks the relative amount of time that has passed
-since the subject pressed down the lever,
-starting the trial.
-When the time of the stimulus can be predicted,
-the \textit{Timer} population speeds
-responding by increasingly inhibiting the
-\textit{Waiting} population over time.
-It can also effect a motor action on its own by
-disinhibiting \textit{Release} neurons sufficiently.
-The \textit{Timer} population is integrative,
-gradually ramping up as it integrates
-the \textit{Waiting} signal.
+As a spiking neuron model,
+this theory of mPFC function is uniquely able to be
+manipulated; manipulations at the neural level
+can be examined at any point, from the single-cell
+to the behavioural level.
 
-\section{Methods}
+One possible manipulation is to
+ablate a portion of recurrent synapses,
+which could model the effect of brain trauma or aging.
+The effects on the mPFC's ability to track the
+task state space can be seen in figure ???.
+%%% MORE
+
+Since we also know the mathematics behind the mPFC activity,
+we can instead manipulate the mathematical model
+and make detailed predictions about neural activity.
+For example, it is hypothesized that in aging,
+recurrent connections become weaker, and therefore
+the persistent activity that is seen in working memory models
+cannot be maintained for long periods of time.
+This can be modeled by including a small damping term, $d < 0$,
+in equation ???.
+
+\begin{equation*}
+  \begin{bmatrix}
+    \dot{x_1} \\ \dot{x_2}
+  \end{bmatrix} = \begin{bmatrix}
+    -\beta R + d & 0 \\ \alpha & -\beta R + d
+  \end{bmatrix} \begin{bmatrix}
+    x_1 \\ x_2
+  \end{bmatrix} + \begin{bmatrix}
+    1 & -1 \\ 0 & 0
+  \end{bmatrix} \begin{bmatrix}
+    A \\ P
+  \end{bmatrix} 
+\end{equation*}
+
+In addition to seeing the lower-level effects
+of these two manipulations,
+we can also make the same manipulations in the full
+top-down model. As can be seen in figure ???, % STUFF
+
+\subsection{Predictions}
+
+??? collect together predictions
+
+\section{Discussion}
+
+??? Talk about the results
+
+On interesting feature of the model is its stochastic nature.
+While it can be though to represent individual differences,
+it is also a useful notion to consider that the model
+represents one snapshot during a subject's
+learning of the task.
+There is no learning in this model;
+while the connection weights are solved for ``optimally,''
+due to the large amount of noise in the system,
+learning would be very likely to fine-tune
+the mPFC's ability to traverse and
+be sensitive to parts of the task-state space.
+Therefore, the poor performance of, for example,
+top-down model instance ??? can be thought of as
+a subject whose recurrent connection is too strong
+and therefore is a poor performer in the task,
+or it could be thought of as a subject
+who has not yet learned how to properly time
+the interval, and after more trials would,
+with learning, be able to make less premature errors.
+
+Stepping back, the overarching theory of the paper,
+that the mPFC tracks the task state space, ??? more
+
+The theory sets up the possibility for many arbitrary tasks.
+Basically, each task has $N$ important dimensions.
+The passive dynamics are likely a combination
+of integrative and non-integrative dimensions,
+enabling for flows in many directions of the space.
+The mPFC is drive to specific parts of the state space
+based on the sensory environment (e.g.,
+being pushed to the top of the state space when lever pressing).
+The mPFC then learns to be sensitive to salient
+parts of the state space (e.g.,
+the force release zone).
+
+\clearpage
+
+\appendix
+
+\section{Materials and methods}
 
 \subsection{Simple reaction time task}
 
@@ -340,207 +639,48 @@ whose spikes were included in this study.
 
 \subsection{Theoretical}
 
-Two models were created to explain neural processing
-in the simple reaction time task.
-The first is a double-integrator model,
-as is described in ?, %???cite singh eliasmith???,
-which allows for precise comparisons
-between the spiking behaviour of
-the model and the empirical subjects
-given a controllable behavioural outcome.
-The second is an integrated model that
-expands the double-integrator model
-to include populations that manipulate the environment,
-allowing for the comparison between
-the model and empirical behaviour.
-
-Both models are made up of heterogeneous populations
-of leaky integrate-and-fire neurons
-created and connected using the methods
-of Eliasmith and Anderson ?. % ???cite???.
-Connections between populations of neurons
-are determined based on the function computed
-through the connection.
-Connection weights are determined
-by solving a least-squares minimization
-of the function representation
-given the tuning properties
-of the neurons representing the function parameters,
-as described in ? %???singheliasmith???
-and in detail in ?. %???eliasmith anderson ???.
-
 \subsubsection{Double-integrator model}
 
-In  %???cite???
-it is shown that
-a population of heterogeneous adaptive leaky integrate-and-fire neurons
-representing a two-dimensional signal
-can capture the dynamics of
-working memory cells in prefrontal cortex.
-There are, however, several network configurations
-that can result in a population of neurons
-representing two integrated signals,
-as shown in figure ?. %???copy fig 5 from paper???.
 
-We adopt the coupled one-dimensional integrator model,
-despite little evidence that reciprocal projections
-are localized to smaller integrative populations.
-Instead, it is the PCA of mPFC activity
-that suggests many neurons are
-only sensitive to one of the principal components.
-Additionally, it is more intuitive
-to connect each principal component with
-a separate neural population.
-The important task, then,
-is to connect each population
-with the appropriate value being encoded.
+The Singh \& Eliasmith model (2006).
+This model is created using the methods of the
+Neural Engineering Framework.
+The model uses neural integration in order to explain
+neural data in a working memory task.
+The paper proposes two candidate models
+that can create the desired functional effects
+with different neural dynamics.
 
-Figure ? %???put in???
-summarizes our mapping.
-The two coupled one-dimensional oscillators represent
-the subject's existence in a particular behavioural state
-and how long the subject has been in that state.
-The behavioural state is entered
-once the subject presses down the lever,
-modeled by the activation
-of a population of press-sensitive neurons.
-The timing integrator is driven
-by the state population, as follows from ?. %???citesingh???.
-Both coupled integrators are controllable
-through a second dimension, %(???cite eliasmith here? ???),
-which allows the integrators to be
-reset to an initial point (0.0)
-when reward is delivered to the subject.
-The two one-dimensional integrators
-are then projected to an output population that
-tracks both signals.
+In the single population model, a single population of
+adaptive leaky integrate-and-fire neurons represents
+a four-dimensional signal.
+A recurrent connection causes the signals
+being represented in two of the dimensions
+to integrate; the connection
+also causes one of the integrative dimensions
+to drive the second integrative dimension.
+The remaining two dimensions are used
+to control the integrative dimensions,
+returning them to some baseline activity if necessary.
 
-The press- and reward-sensitive populations
-drive the rest of the activity of the network.
-These two populations are driven by the experimenter,
-based on the behaviour being simulated.
-For example, for a sequence of correct trials,
-the press-sensitive population
-will be driven strongly at the start of a trial,
-followed 1.6 seconds later
-by strongly driving the reward-sensitive population.
-For error trials, the reward population
-is not driven between activations of the press population.
+In the coupled population model, two populations of
+adaptive leaky integrate-and-fire neurons represent
+two two-dimensional signals.
+Recurrent connections on each population cause
+one of the represented dimensions to be integrated,
+while the other dimension controls the integration.
+An explicit connection between one integrative population
+drives the integrator in the other population.
+Both of the integrative dimensions are then
+projected to a final two-dimensional population,
+which only represents the integrative signals.
 
-\subsubsection{Integrated motor-mPFC model}
-
-In order to expand the double-integrator model
-to directly manipulate elements of the environment,
-three additional variables must be accounted for:
-release, auditory cue, and control.
-
-The PCA in ? %???kumar???
-revealed
-neurons that are sensitive to both press and release.
-For this reason, the press-sensitive population
-was increased in dimensionality
-such that the population was sensitive
-to both press and release,
-in the same manner to the multidimensional
-methods used in ?. %???singh eliasmith???.
-
-The auditory cue ?
-%??? todo : see if it's necessary to be an integrator ???
-
-Control is the signal
-that causes release-sensitive neurons to fire,
-resulting in the release of the lever.
-Determining how to implement this control
-is one of the primary goals
-of mPFC research in tasks with delays.
-Its implementation is in itself
-a hypothesis of how the mPFC and motor cortex interact
-in order to perform these tasks.
-
-\subsubsection{Implementing release control}
-
-? %???kumar???
-use their PCA to propose a conceptual model,
-shown in Fig ?. %???include???.
-We extend this model
-by associating prepotent response and proactive inhibition
-with neural populations and
-showing how they can be connected
-such that the model can respond
-within the 600 ms response window.
-
-In the double integrator model,
-a population of neurons tracks the current behavioural state.
-In the integrated model, two populations
-track a similar but subtly different quantity.
-One population is assumed to exist
-in motor cortex, and tracks whether or not
-the subject is currently holding down the lever.
-This is an integrative population,
-which is driven by press-sensitive neurons.
-The other population is assumed to exist
-in medial PFC, and tracks whether or not
-the subject should be delaying the release response.
-It is primarily driven by the motor cortex's
-holding population.
-
-The motor cortex's holding population
-sends excitatory projections
-to the release-sensitive neurons,
-effecting the prepotent response from the conceptual model.
-The medial PFC's waiting population
-send inhibitory projects
-to the release-sensitive neurons,
-effecting the proactive inhibition from the conceptual model.
-It should be noted that this organization
-produces a slight delay between these two quantities,
-with prepotent response occurring first,
-quickly followed by proactive inhibition.
-This is consistent with ?. %???figure from JNP2009???.
-
-The medial PFC's waiting population's activity
-is further modulated by two task-related populations.
-One is a ramping population that tracks
-the time since the press was initiated.
-The other is a cue-sensitive population
-that is driven by the onset of the auditory cue.
-These two populations
-release the proactive inhibition,
-causing the release neurons to be disinhibited,
-effecting the release of the lever.
-
-As will be discussed further in ?, %???sec???,
-the similarity between the two populations
-may explain why the first two principal components
-of motor cortex and mPFC are very similar.
-
-\subsubsection{Model manipulations}
-
-The model is manipulated in three ways
-in this study.
-
-The model emulates the effects of aging
-by decreasing the number of neurons
-in each neural population,
-by uniformly decreasing the strength
-of each synapse in the network,
-and by randomly removing a fraction
-of all synapses in the network.
-
-Lesion studies are emulated
-by targeted ablations of either
-neurons or synapses in or between specific
-neural populations.
-
-Cooling is emulated by
-lowering the distribution
-of neural gains associated with the
-leaky integrate-and-fire neurons
-in the neural populations being cooled.
-Time constants affecting transmission speed
-between populations are raised
-to emulate slowed transmission speed
-as a result of the cooling of white matter.
+In this paper, we hypothesize that the mPFC
+is a realization of one of these two models.
+The integrators are driven by the actions taken by the subjects
+(e.g., lever pressing),
+and are controlled by the outcomes
+(e.g., reward delivery).
 
 \subsection{Analysis}
 
@@ -559,8 +699,6 @@ at ?. % github URL
 
 \subsubsection{Behaviour}
 
-Figure 4 summarizes a single trial
-of the reaction time task.
 In both the empirical and theoretical studies,
 the following relevant event times are recorded:
 lever press, lever release, reward delivery,
@@ -612,240 +750,450 @@ under 1 Hz and whose firing rates were non-stationary
 across trials
 (determined by a Wald-Wolfowitz runs test with $|Z| > 4$).
 
-\section{Results}
-
-\subsection{Model behaviour is less variable}
-
-A stereotypical trial for both the model
-and experimental subjects is shown
-in Figure 5.
-The experimental session lasted ? seconds,
-over which ? trials were performed.
-? trials were identified as correct trials;
-? were premature responses,
-and ? were delayed responses.
-The model session lasted 500 seconds,
-over which ? trials were performed.
-? trials were identified as correct trials,
-? were premature responses
-and ? were delayed responses.
-
-Over all trials for all subjects,
-experimental subjects performed ? trials
-with a ? \% success rate.
-The model performed ? trials with a
-? \% success rate.
-
-The distribution of reactions times, shown in figure 5,
-is Gaussian-like with a long tail greater than the mean
-for both model and data.
-The mean reaction time for all experimental subjects
-was ? $\pm$ ?.
-The mean reaction time for all model subjects
-was ? $\pm$ ?.
-
-\subsection{Model principal components are similar}
-
-Principal component analysis on the spike trains
-produced by the model show the same number
-of primary principal components, with similar shapes.
-
-In the neural populations hypothesized
-to reside in motor cortex, as shown in Figure 6,
-three leading components are identified.
-As in the experimental data,
-PC1 is rises around the time of the press
-and maintains a high value until the release,
-at which point it drops.
-PC2, which is very similar
-to the cumulative sum of PC1,
-is modulated at the time of lever press,
-and slowly changes during the delay period.
-PC3 is strongly modulated at both the
-time of lever press and release.
-Firing rates in the model match those in
-the data, increasing before the press
-and after release.
-
-In the neural populations hypothesized
-to reside in medial prefrontal cortex,
-as shown in figure 7,
-two leading components are identified.
-The first component is strongly modulated
-around the time of lever press,
-and slowly decreases during the delay period.
-The second component,
-which is similar to the cumulative sum of
-PC1, increases at the time of lever press,
-and remains high during the delay period.
-
-\subsection{Model manipulations}
-
-Aging results, figure 8.
-
-Lesion results, figure 9.
-
-Cooling results, figure 10.
-
-\section{Discussion}
-
-\subsection{Model behavioural variability is low}
-
-The primary difference is in the amount
-of inter-trial and intra-trial variability.
-Experimental subjects had several blocks of time
-in which they performed as many trials as the model,
-but those blocks of time were interrupted by
-error trials and time in which the animal
-was performing other actions such as grooming.
-Within the trial, reaction time distribution
-for the model and experimental subjects are
-similar but with far less variability.
-The model's reactions times
-are within the experimental subjects'
-mean and standard deviation, however,
-suggesting that the model
-could have the same variability
-by simply injecting noise into the system.
-This would also result in
-the error trials that are missing in the model.
-
-A better basis for comparison for the model
-would be human performance in a similar
-reaction time task. ?find some % Look up some behavioural data
-
-\subsection{Model principal components match the data}
-
-While it may be unsurprising
-due to the model being inspired by the original
-principal component analysis,
-it is strong validation for the original conceptual model
-that the implemented model maintain
-the same principal components
-while still being able to simulate behaviours.
-
-? List differences and investigate (with final version of model)
-
-\subsection{Model predictions}
-
-The model manipulations assert that blah has the effect of blah.
-
-Prior studies (some unpublished) have suggested that these are indeed the effects of those things.
-
-Cooling has not been studied in an experimental setting,
-and so we take the results as a prediction of the model.
-
 \clearpage
-
-\appendix
 
 \section{Figures}
 
-\begin{figure}
-  \centering
-    \includegraphics[width=\columnwidth]{f1-pcasummary}
-    \caption{Summary of principal components identified
-      by Narayanan and Laubach, 2009. Three components
-      were identified in motor cortex (top row), accounting
-      for over 60\% of variation.
-      Two components were identified in prefrontal cortex
-      (bottom row), accounting for over 25\% of variation.}
-\end{figure}
+\scalefigone{f1.png}{1.0}{~}
+
+A summary of previous experimental findings. Data from JNP 2009.
+
+A: The simple reaction time task used in the experiment.
+The subject presses and holds down the lever
+for a delay (also called the foreperiod);
+1 second is used in this study.
+After the foreperiod, an auditory tone (the stimulus) is played.
+The subject then has 0.6 seconds (called the response window)
+in which to release the lever.
+If the lever is released in that time,
+the subject is rewarded with juice.
+If the lever is released during the foreperiod,
+it is called a premature error,
+and is penalized by a 5 second time-out. % NOTE: HOW LONG IS TIMEOUT?
+If the lever is not released within the response window,
+it is called a late error,
+and is also penalized by a 5 second time-out.
+
+B: When lever release events occurred.
+Each trial is aligned such that the press event
+occurs at time $t=0$.
+All of the trials shown are correct trials.
+Black dots represent correct trials
+that were preceded by correct trials.
+Red dots represent correct trials
+that were preceded by error trails
+(either premature or late).
+
+C: Peri-event spike rasters and histograms
+showing different neural activity
+based on the previous outcome.
+In all six plots, black represents activity
+when the last trial was correct, and red
+represents activity when the last trial was an error.
+The shaded grey areas note where
+the neural activity is significantly different
+between the two conditions (post-correct and post-error).
+In the top row, there is elevated neural activity
+before the press is initiated, following an error.
+In the middle row, there is elevated neural activity
+before the press is initiated (both)
+and during the foreperiod (right)
+following correct trials.
+In the bottom row, there is elevated neural activity
+during the whole trial (left)
+and after the trial (right)
+following error trials.
+
+D: Linear regression with a GLM was performed
+on the neural activity.
+Before the press is initiated,
+18.7\% of neurons encoded the previous outcome,
+compared to less than 10\% that
+encoded the current reaction time. % WHAT DOES INTERACTION MEAN HERE?
+
+E: Z-statistics showing which neurons were significantly
+modulated by the previous outcome, and when.
+(Top) Sorted by the absolute value of the Z-statistic.
+The bottom 18.7\% of the rows have high average Z-scores
+($p > 0.05$?). % WHAT SAYS THOSE ARE SIGNIFICANT?
+(Bottom) Sorted by the peak of the Z-statistic.
+The line is close to linear, suggesting that the
+previous outcome information is being encoded over time
+by the entire population. % DOES IT SUGGEST THAT?
 
 \clearpage
 
-\begin{figure}
-  \centering
-    \includegraphics[width=\columnwidth]{f2-conceptual}
-    \caption{The conceptual model proposed by Narayana and
-      Laubach, 2009. In the conceptual model, the start of the
-      trial activates two systems; one prepares the response
-      action (prepotent response) and the other inhibits
-      that action until the appropriate time (proactive inhibition).}
-\end{figure}
+\scalefigone{f2.png}{1.0}{~}
+
+A summary of the principal component analysis done
+in JNP 2009;
+the motivation for investigating Singh \& Eliasmith 2006.
+
+A: A graphical summary of principal component analysis.
+Nomarlized peri-event neural data,
+in the form of the z-scores of instantaneous firing rates,
+is organized in a matrix, with each row
+being the z-scored firing rates
+of a single neuron on a single trial.
+Singular value decomposition is performed on the matrix,
+resulting in a matrix such that
+the number of columns (time bins) is the same.
+The rows are now ordered such that the first row
+contains largest eigenvector,
+which represents the value when the original
+data is projected onto the axes of highest variance.
+
+B: The fraction of variance explained
+by each singular value
+when PCA is performed on the post-correct neural data
+(top), and the post-error data (bottom).
+In both cases, the two eigenvectors with the highest
+singular values account for nearly 50\% of variance.
+The next two eigenvectors also account for an amount
+of variance higher than would be expected when
+we interpolate from the smaller
+singular values.
+
+C: A summary of the loadings of the two top
+eigenvector on each neuron.
+If a neuron were encoding both the first and second
+eigenvectors to the same degree,
+we would expect a horizontal line.
+The varied lines criss-crossing each other
+suggests that each individual neuron
+has different sensitivities
+to the first and second principal components.
+
+D: The top three principal components
+for the post-correct trials (black)
+and the post-error trials (red).
+
+In the post-correct case,
+the first principal component is generally high
+during the foreperiod of the task, with bumps
+before and after the foreperiod, and is low elsewhere.
+The second principal component appear to ramp up
+before the task, and down during the task.
+The third principal component is similar
+to the first.
+
+In the post-error case,
+the first principal component is generally high
+before the press event, mostly constant during
+the foreperiod, and low after the trial.
+The second principal component is generally high
+during the foreperiod of the task,
+and closely resembles the first component
+in the post-correct case.
+The third principal component ramps down
+during the task state, and closely resembles
+the second component in the post-correct case.
+
+E: (Top) Plotting the cumulative sum (integral)
+of the first principal component closely matches
+the second principal component, and vice-versa
+($R^2 = 0.904$ and $R^2 = 0.939$ respectively),
+in the post-correct case.
+(Bottom) In the post-error case,
+the first two principal components are no longer
+cumulative sums of each other
+($R^2 = 0.639$ and $R^2 = 0.676$).
+This points to neural integration
+as a potential mechanism explaining mPFC activity.
+
+F: Normalized spike-density functions
+for all of the neurons analyzed in the post-correct case,
+organized by the loading
+(left) on the first principal component, and
+(right) on the second principal component.
+These clearly show neurons whose activity
+matches the calculated principal components.
 
 \clearpage
 
-\begin{figure}
-  \centering
-    \includegraphics[width=\columnwidth]{f3-fullmodel}
-    \caption{The proposed implementation of the conceptual model.
-      The motor cortex is made up of two populations of
-      leaky integrate-and-fire neurons, one of which interacts
-      with the environment by pressing or releasing a lever.
-      The medial prefrontal cortex is made up of three
-      populations of LIF neurons. See text (section 2) for details.}
-\end{figure}
+\scalefigone{f3_blocks.pdf}{1.0}{~}
+
+The Singh \& Eliasmith model (2006).
+This model is created using the methods of the
+Neural Engineering Framework.
+The model uses neural integration in order to explain
+neural data in a working memory task.
+The paper proposes two candidate models
+that can create the desired functional effects
+with different neural dynamics.
+
+(Left) A single-population model.
+In this model, a single population of
+adaptive leaky integrate-and-fire neurons represents
+a four-dimensional signal.
+A recurrent connection causes the signals
+being represented in two of the dimensions
+to integrate; the connection
+also causes one of the integrative dimensions
+to drive the second integrative dimension.
+The remaining two dimensions are used
+to control the integrative dimensions,
+returning them to some baseline activity if necessary.
+
+(Right) A coupled-population model.
+In this model, two populations of
+adaptive leaky integrate-and-fire neurons represent
+two two-dimensional signals.
+Recurrent connections on each population cause
+one of the represented dimensions to be integrated,
+while the other dimension controls the integration.
+An explicit connection between one integrative population
+drives the integrator in the other population.
+Both of the integrative dimensions are then
+projected to a final two-dimensional population,
+which only represents the integrative signals.
+
+In this paper, we hypothesize that the mPFC
+is a realization of one of these two models.
+The integrators are driven by the actions taken by the subjects
+(e.g., lever pressing),
+and are controlled by the outcomes
+(e.g., reward delivery).
 
 \clearpage
 
-\begin{figure}
-  \centering
-    \includegraphics[width=\columnwidth]{f4-behaviour}
-    \caption{Possible outcomes for each trial. If the subject
-      responds within the 0.6 second response window, the trial
-      is counted as correct and reward is delivered. If the
-      subject responds prematurely, it is counted as an error
-      and house lights are extinguished for a timeout period.
-      If the subject responds after the response window,
-      an error is also recorded and the lights are extinguished.}
-\end{figure}
+\scalefigone{f3_pca.pdf}{1.0}{~}
+
+A comparison between the two model realizations
+from Singh \& Eliasmith in this task.
+
+A: Raw spike rasters generated by the two models.
+Modulation around the foreperiod can clearly be seen.
+Differences between the post-correct and post-error
+conditions can also be determined,
+though the difference is more visually discernible
+in the coupled model.
+
+B: Principal component analysis
+on the simulated data (right) shows similar trends
+as the experimental data (left).
+% MORE DETAIL
+
+C: Normalized spike-density functions,
+organized by loadings on PCs (as in the experimental data)
+show neurons that clearly follow the PCs.
+Neurons that do not follow the PCs
+can also be visually identified.
 
 \clearpage
 
-\begin{figure}
-  \centering
-    \includegraphics[width=\columnwidth]{f5-behaviour}
-    \caption{Summary of model and experimental behaviour.
-      (Left) Seconds 200 - 500 of an experimental (top)
-      and model (bottom) session.
-      (Right) Histograms of reactions times for
-      experimental and model subjects.}
-\end{figure}
+\scalefigone{f4_traj.pdf}{1.0}{~}
+
+Plotting the state space (phase space) of the data
+allows us to reason about what the principal components
+may be representing in general.
+
+A: The experimental data's trajectory
+through the phase space formed by the first two
+principal components.
+
+B: The simulated data's trajectory
+through the phase space formed by the first two
+principal components.
+
+C: A mathematical model of the trajectory
+through state space.
+This model is defined by a two-dimensional
+dynamical system that is affected
+by the actions taken by some outside system,
+and the outcomes of those actions.
+
+D: When the mathematical model is implemented
+in a spiking neural model using the NEF,
+we can look at the decoded activity in the
+two integrative dimensions,
+instead of relying on the PCs
 
 \clearpage
 
-\begin{figure}
-  \centering
-    \includegraphics[width=\columnwidth]{f6-mcpca}
-    \caption{Principal components identified in motor cortex
-      spike data. (Top) Experiment. (Bottom) Model.}
-\end{figure}
+\scalefigone{f5_tdcontrol.pdf}{1.0}{~}
+
+Previous work by Laubach et al. (and other groups)
+has implicated mPFC as a top-down controller
+on the motor cortex in delay tasks like simple RT.
+Their work suggests that the mPFC directly inhibits
+the motor cortex; this paper's hypothesis
+is more general, and proposes that the mPFC
+can either inhibit, directly excite,
+or modulate other activity being projected
+to the motor cortex
+depending on the state of the mPFC.
+
+A: A schematic of how top-down control
+could be exerted on a simple stimulus-response
+motor control system.
+The mPFC state is tracked in this two-dimensional system.
+In the green area, which is entered
+by the black trajectory
+(exemplifying correct trials),
+a release is forced to occur.
+In the red area, which is entered
+by the red trajectory
+(exemplifying error trials),
+the subject is not performing the task well,
+and enters a cue-sensitive state,
+in which gain is applied
+to the auditory cue stimulus input.
+
+B: The simple stimulus-response motor control system
+on which top-down control is being exerted.
+This system is shown to perform the simple RT task
+with high accuracy,
+but with a relatively slow reaction time
+(see Fig ???).
+This is due to the system waiting until the cue
+to start the process of initiating the release.
+
+Briefly, the stimulus response system is made up
+of three populations of adaptive leaky integrate-and-fire neurons
+that interact with the environment
+(explicitly modeled in the Nengo simulation environment).
+At the start of a trial, the press-sensitive neurons
+in the \textit{Press/Release} population become active.
+This drives the \textit{Holding} integrator,
+which will maintain a relatively high amount of activity.
+This activity is projected to the \textit{Trigger} neurons,
+which are then primed to cause a release.
+When the trigger stimulus is delivered by the environment,
+it further activates the \textit{Trigger} neurons,
+which require both inputs in order to activate
+the release-sensitive neurons
+in the \textit{Press/Release} population,
+causing the release of the lever
+modeled by the environment.
+
+C: The combined stimulus-response motor control system,
+with the Singh \& Eliasmith coupled-integrators
+providing top-down control.
+Top-down control is exerted through the \textit{Trigger}
+population, allowing it to explicitly force a release
+by providing input in both dimensions,
+or sensitizing and desensitizing the population
+to the trigger stimulus
+by providing input only in the same dimension
+that the \textit{Holding} population projects to.
+Details on the coupled-integrator model
+can be found in figure ???.
 
 \clearpage
 
-\begin{figure}
-  \centering
-    \includegraphics[width=\columnwidth]{f7-pfcpca}
-    \caption{Principal components identified in medial prefrontal
-      cortex spike data. (Top) Experiment. (Bottom) Model.}
-\end{figure}
+\scalefigone{f6_dynamics.pdf}{1.0}{~}
+
+Breaking down the mathematical model
+into what happens in the three cases gives
+an intuitive explanation for how this dynamical system operates.
+
+A: The start of all trials.
+In all cases, no matter what the initial state,
+the system is drive upwards,
+close to [1.0, 0.0]. This sets the initial state
+for the task.
+
+B: In a correct trial, the passive dynamics of the system
+push the state to the right
+at a predictable (i.e., learned) rate.
+The release happens when the state of the system
+is sufficiently far to the right (i.e., $x$ is high).
+If this release happens properly, reward is delivered,
+which pushes the system back to the origin.
+Then, in the absence of any task-related dynamics,
+the system will stay approximately at rest
+because the passive dynamics of the system are very small
+at the origin point.
+
+C: A premature error can be caused by some other factor
+(i.e., a motor system mistake) or by the passive dynamics
+of the system being too strong in the part of the state space
+that the system is driven to once the subject presses the lever.
+In the case of some other factor,
+the system will receive the negative outcome feedback
+before reaching the right side of the state-space,
+and be driven to the bottom.
+In the case of fast integration,
+the system will reach the right side of the state-space,
+force a release, and then receive the negative outcome feedback
+and be driven to the bottom.
+The exact state after receiving the negative feedback
+can be used to figure out the cause of the error,
+though after some time in the lower part
+of the state space, the system will be
+driven to the left,
+and all that can be decoded
+is the notion that an error occurred.
+
+D: A late error can be caused by either another factor
+not responding to the top-down control properly or in time,
+by right-ward drift happening too slowly,
+or by the system not being driven
+to the appropriate place upon pressing down the lever
+and drifting slowly as a result.
 
 \clearpage
 
-\begin{figure}
-  \centering
-    % \includegraphics[width=\columnwidth]{f7-pfcpca}
-    Placeholder
-    \caption{Aging results}
-\end{figure}
+\scalefigone{f7_behaviour.pdf}{1.0}{~}
+
+Summary of behaviour in experimental subjects,
+simulated subjects with only the stimulus-response system,
+and simulated subjects with the stimulus-response system
+under top-down control.
+
+A: Experimental results.
+% GIVE TRENDS AND STUFF
+
+B: For the stimulus-response system,
+% GIVE TRENDS AND STUFF
+
+C: For the system with top-down control,
+% GIVE TRENDS AND STUFF
 
 \clearpage
 
-\begin{figure}
-  \centering
-    % \includegraphics[width=\columnwidth]{f7-pfcpca}
-    Placeholder
-    \caption{Lesion results}
-\end{figure}
+\scalefigone{f8_manipulations.pdf}{1.0}{~}
 
-\clearpage
+The model can be manipulated in several ways
+in order to investigate the effects
+of various pathologies.
 
-\begin{figure}
-  \centering
-    % \includegraphics[width=\columnwidth]{f7-pfcpca}
-    Placeholder
-    \caption{Cooling results}
-\end{figure}
+A: By including a damping term in the dynamical system,
+we impair the system's ability to maintain its state.
+This can be visualized as an attractive force
+pulling the system towards the origin.
+This makes it more difficult or impossible
+to confidently exert top-down control,
+depending on the amount of damping.
+This effect can be modeled by degrading
+the recurrent connection weights by a small amount,
+causing the integrative populations to drift
+back to the origin.
+The amount of weight degradation affects
+how quickly the population drifts back to the origin.
+This model realization of this damping
+closely resembles what happens in
+normal aging: recurrent NDMA connections
+lose synaptic strength.
+The model predicts that the new trajectory
+in the state space would more closely resemble
+those in the damped mathematical model.
+
+B: The simulated model can
+instead be manipulated by randomly deleting
+recurrent synaptic connections.
+When this is done,
+the model takes the trajectories shown.
+This predicts what may occur in the mPFC
+in the case of targeted lesions,
+or general trauma such as a concussion.
+
+C: The behavioural effects of these two
+model manipulations when they are done
+on the full model with top-down control.
+% GIVE SOME EXPLANATIONS
 
 \end{document}
+
+
