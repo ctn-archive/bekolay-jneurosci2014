@@ -1,0 +1,5 @@
+.DS_Store
+/paper/auto
+*.aux
+*.log
+/paper/jneurosci2013.pdf
