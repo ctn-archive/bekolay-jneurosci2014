@@ -1,6 +1,9 @@
 .DS_Store
 /paper/auto
 *.aux
+*.bbl
+*.blg
 *.log
+*.out
 /paper/jneurosci2013.pdf
 /paper/jneurosci2013.synctex.gz
