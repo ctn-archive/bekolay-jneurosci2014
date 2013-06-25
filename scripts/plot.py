@@ -141,7 +141,7 @@ def plot_pc_summary(exp, sim, name='pc_summary', pos='left'):
 
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.05, wspace=0.05, left=left, right=right)
-    save_or_show('figures/%s_pc' % name)
+    save_or_show('plots/%s_pc' % name)
 
 
 def plot_dynamics(trajectories, vf, name='trajectory', pos='left'):
@@ -196,7 +196,7 @@ def plot_dynamics(trajectories, vf, name='trajectory', pos='left'):
     plt.axis((-1.3, 1.3, -1.3, 1.3))
     plt.subplots_adjust(bottom=0.1, top=1.0, left=0.1, right=1.0)
 
-    save_or_show('figures/' + name + '_traj')
+    save_or_show('plots/' + name + '_traj')
 
 
 def plot_trajectory(trajectories, name='trajectory', pos='left'):
@@ -251,7 +251,7 @@ def plot_trajectory(trajectories, name='trajectory', pos='left'):
     plt.axis((-1.5, 1.5, -2.0, 1.5))
     plt.subplots_adjust(bottom=0.12, top=0.97, left=0.17, right=0.97)
 
-    save_or_show('figures/' + name + '_traj')
+    save_or_show('plots/' + name + '_traj')
 
 
 def plot_performance(cor, prem, late, name='performance', pos='left'):
@@ -289,7 +289,7 @@ def plot_performance(cor, prem, late, name='performance', pos='left'):
         ax.set_yticks(())
 
     plt.tight_layout()
-    save_or_show('figures/' + name + '_perf')
+    save_or_show('plots/' + name + '_perf')
 
 
 def plot_reactiontimes(rts, rtstats, name='reaction_times', pos='left'):
@@ -322,7 +322,7 @@ def plot_reactiontimes(rts, rtstats, name='reaction_times', pos='left'):
         plt.xlabel("Adaptive control model")
 
     plt.tight_layout()
-    save_or_show('figures/' + name + "_rts")
+    save_or_show('plots/' + name + "_rts")
 
 
 def plot_signals(sd, name='signals', pos='left'):
@@ -380,7 +380,7 @@ def plot_signals(sd, name='signals', pos='left'):
     plt.xlabel("Time (s)")
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.025, top=0.94, left=left, right=0.9)
-    save_or_show('figures/' + name + '_signals')
+    save_or_show('plots/' + name + '_signals')
 
 
 def plot_raster(d, name='raster'):
@@ -396,4 +396,4 @@ def plot_raster(d, name='raster'):
     plt.axvline(1.0, ls='--', color='k')
 
     plt.tight_layout()
-    save_or_show('figures/' + name + '_raster', ext='.png')
+    save_or_show('plots/' + name + '_raster', ext='.png')

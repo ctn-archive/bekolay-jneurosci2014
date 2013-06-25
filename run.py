@@ -105,14 +105,15 @@ if __name__ == '__main__':
     rootdir = os.path.dirname(os.path.realpath(__file__))
     os.chdir(rootdir)
 
-    print ("Options: data_download keep convert plot combine "
+    print ("Options: download_data keep convert plot combine "
            "(dint|ctrl|all) paper")
 
     # If we're rerunning, we'll delete existing figures
     if 'keep' not in sys.argv:
-        if os.path.exists('figures'):
-            for f in os.listdir('figures'):
-                os.unlink(os.path.join('figures', f))
+        if os.path.exists('plots'):
+            for f in os.listdir('plots'):
+                if f.endswith('svg'):
+                    os.unlink(os.path.join('plots', f))
 
     # Use IPython parallel stuff
     rc = parallel.Client()
@@ -275,14 +276,14 @@ if __name__ == '__main__':
         r = []
 
         r.append(schedule(lview, c.fig4, None))
-        r.append(schedule(lview, c.fig5, None, 'figures/cc-933_traj.svg'))
-        r.append(schedule(lview, c.fig6, None, 'figures/cc-454_pc.svg'))
+        r.append(schedule(lview, c.fig5, None, 'plots/cc-933_traj.svg'))
+        r.append(schedule(lview, c.fig6, None, 'plots/cc-454_pc.svg'))
         r.append(schedule(lview, c.fig7, None))
         r.append(schedule(lview, c.fig8, None,
-                          'figures/simple-420_c_signals.svg',
-                          'figures/simple-420_l_signals.svg',
-                          'figures/adaptive-35_c_signals.svg',
-                          'figures/adaptive-35_p_signals.svg'))
+                          'plots/simple-420_c_signals.svg',
+                          'plots/simple-420_l_signals.svg',
+                          'plots/adaptive-35_c_signals.svg',
+                          'plots/adaptive-35_p_signals.svg'))
 
         wait_for(r, "Combining figures")
 
