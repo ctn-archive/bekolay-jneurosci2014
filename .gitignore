@@ -9,3 +9,8 @@
 /paper/jneurosci2013.synctex.gz
 /paper/coverletter.pdf
 /paper/coverletter.synctex.gz
+*.h5
+*.csv
+*.pyc
+*.class
+*.svg
