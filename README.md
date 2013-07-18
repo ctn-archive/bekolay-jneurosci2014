@@ -15,6 +15,17 @@ The code in this repository is licensed under the
 [MIT license](http://tbekolay.mit-license.org/).
 Please use it and share your changes!
 
+run.py usage
+============
+
+  download_data - Downloads data from figshare
+  convert - Convert any CSVs in data/ to HDF5
+  plot - Run all plotting scripts
+  combine - Combine plots into figures
+  (dint|ctrl|all) - Analyze all data files, or just dint/ctrl
+  paper - Run pdflatex and bibtex to generate paper
+
+
 Requirements
 ============
 
