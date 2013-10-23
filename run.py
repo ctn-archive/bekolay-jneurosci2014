@@ -105,24 +105,29 @@ if __name__ == '__main__':
     rootdir = os.path.dirname(os.path.realpath(__file__))
     os.chdir(rootdir)
 
-    print ("Options: download_data keep convert plot combine "
+    print ("Options: download_data clean convert plot combine "
            "(dint|ctrl|all) paper")
 
-    # If we're rerunning, we'll delete existing figures
-    if 'keep' not in sys.argv:
+    if 'download_data' in sys.argv:
+        download_data()
+
+    if 'clean' in sys.argv:
         if os.path.exists('plots'):
             for f in os.listdir('plots'):
                 if f.endswith('svg'):
                     os.unlink(os.path.join('plots', f))
 
     # Use IPython parallel stuff
-    rc = parallel.Client()
+    try:
+        rc = parallel.Client()
+    except IOError:
+        print ("IPython cluster not running. Please run:"
+               "\nipcluster start --n=7")
+        sys.exit()
+
     lview = rc.load_balanced_view()
     lview.block = False
     r = []
-
-    if 'download_data' in sys.argv:
-        download_data()
 
     # Convert all CSVs to HDF5
     if 'convert' in sys.argv:

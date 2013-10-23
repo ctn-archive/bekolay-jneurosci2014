@@ -91,7 +91,7 @@ class AdaptiveControl(DoubleIntegrator):
 
     @staticmethod
     def releasezone(x):
-        return (1. / (1 + math.exp(-100 * (x[1] - 0.8)))) * 1.2
+        return (1. / (1 + math.exp(-9 * (x[1] - 0.9)))) * 1.5
 
     def log_nodes(self, log):
         if self.control == 'adaptive':
