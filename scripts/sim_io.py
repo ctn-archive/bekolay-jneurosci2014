@@ -1,10 +1,10 @@
+from __future__ import absolute_import
+
 import os
 import numpy as np
 import quantities as pq
-from neo import Segment, AnalogSignal, SpikeTrain, EventArray, EpochArray
-from neo.io.baseio import BaseIO
-from neo.io.neuroexplorerio import NeuroExplorerIO
-from neo.io.hdf5io import NeoHdf5IO
+
+from . import neo
 
 
 nengoevents = {
@@ -24,20 +24,20 @@ nexevents = {
 }
 
 
-class NengoSpikeCSVIo(BaseIO):
+class NengoSpikeCSVIo(neo.BaseIO):
     is_readable = True
     is_writable = False
 
-    supported_objects = [Segment, AnalogSignal, SpikeTrain,
-                         EventArray, EpochArray]
+    supported_objects = [neo.Segment, neo.AnalogSignal, neo.SpikeTrain,
+                         neo.EventArray, neo.EpochArray]
 
-    readable_objects = [Segment]
+    readable_objects = [neo.Segment]
     writeable_objects = []
 
     has_header = False
     is_streameable = False
 
-    read_params = {Segment: []}
+    read_params = {neo.Segment: []}
     write_params = None
 
     name = "Nengo"
@@ -46,11 +46,11 @@ class NengoSpikeCSVIo(BaseIO):
     mode = 'file'
 
     def __init__(self, filename=None):
-        BaseIO.__init__(self)
+        neo.BaseIO.__init__(self)
         self.filename = filename
 
     def read_segment(self, lazy=False, cascade=True):
-        seg = Segment(name=self.filename[-4])
+        seg = neo.Segment(name=self.filename[-4])
         seg.file_origin = os.path.basename(self.filename)
 
         with open(self.filename, 'r') as nf:
@@ -59,25 +59,25 @@ class NengoSpikeCSVIo(BaseIO):
                     continue
                 spikes = map(float, l[:-1].split(", "))
                 seg.spiketrains.append(
-                    SpikeTrain(spikes, name=str(i),
-                               units=pq.s, t_stop=np.amax(spikes)))
+                    neo.SpikeTrain(spikes, name=str(i),
+                                   units=pq.s, t_stop=np.amax(spikes)))
         return seg
 
 
-class NengoIO(BaseIO):
+class NengoIO(neo.BaseIO):
     is_readable = True
     is_writable = False
 
-    supported_objects = [Segment, AnalogSignal, SpikeTrain,
-                         EventArray, EpochArray]
+    supported_objects = [neo.Segment, neo.AnalogSignal, neo.SpikeTrain,
+                         neo.EventArray, neo.EpochArray]
 
-    readable_objects = [Segment]
+    readable_objects = [neo.Segment]
     writeable_objects = []
 
     has_header = False
     is_streameable = False
 
-    read_params = {Segment: []}
+    read_params = {neo.Segment: []}
     write_params = None
 
     name = "Nengo"
@@ -86,11 +86,11 @@ class NengoIO(BaseIO):
     mode = 'file'
 
     def __init__(self, filename=None):
-        BaseIO.__init__(self)
+        neo.BaseIO.__init__(self)
         self.filename = filename
 
     def read_segment(self, lazy=False, cascade=True):
-        seg = Segment(name=self.filename[-4])
+        seg = neo.Segment(name=self.filename[-4])
         seg.file_origin = os.path.basename(self.filename)
 
         # Just one pass through the file! Do it live!
@@ -157,28 +157,27 @@ class NengoIO(BaseIO):
             if typ == "SpikeTrains":
                 for i, times in enumerate(dat):
                     seg.spiketrains.append(
-                        SpikeTrain(times, name=col + '_' + str(i),
-                                   units=pq.s, t_stop=t_stop,
-                                   sampling_rate=1.0 / period))
+                        neo.SpikeTrain(times, name=col + '_' + str(i),
+                                       units=pq.s, t_stop=t_stop,
+                                       sampling_rate=1.0 / period))
             elif typ == "AnalogSignal":
-
                 for i, v in enumerate(dat):
                     seg.analogsignals.append(
-                        AnalogSignal(v, units=pq.mV, sampling_period=period,
-                                     name=col + '_' + str(i)))
+                        neo.AnalogSignal(v, units=pq.mV, sampling_period=period,
+                                         name=col + '_' + str(i)))
             elif typ == "EventArray":
                 name = col[:-5] + 'on'
                 labels = np.array([name] * len(dat[0]), dtype='S')
-                seg.eventarrays.append(
-                    EventArray(times=dat[0], labels=labels, channel_name=name))
+                seg.eventarrays.append(neo.EventArray(
+                    times=dat[0], labels=labels, channel_name=name))
                 name = col[:-5] + 'zero'
                 labels = np.array([name] * len(dat[0]), dtype='S')
-                seg.eventarrays.append(
-                    EventArray(times=dat[1], labels=labels, channel_name=name))
+                seg.eventarrays.append(neo.EventArray(
+                    times=dat[1], labels=labels, channel_name=name))
                 name = col[:-5] + 'off'
                 labels = np.array([name] * len(dat[0]), dtype='S')
-                seg.eventarrays.append(
-                    EventArray(times=dat[2], labels=labels, channel_name=name))
+                seg.eventarrays.append(neo.EventArray(
+                    times=dat[2], labels=labels, channel_name=name))
 
         return seg
 
@@ -191,7 +190,7 @@ def convert_to_h5(filename):
     print "Reading " + filename + " ...",
     r = NengoIO(filename)
     seg = r.read_segment()
-    w = NeoHdf5IO(filename[:-3] + "h5")
+    w = neo.NeoHdf5IO(filename[:-3] + "h5")
     w.save(seg)
     w.close()
     os.remove(filename)
@@ -201,12 +200,12 @@ def convert_to_h5(filename):
 
 def get_seg(filename):
     if filename.endswith("h5"):
-        r = NeoHdf5IO(filename)
+        r = neo.NeoHdf5IO(filename)
         seg = r.read_segment()
         r.close()
         return seg, nengoevents
     elif filename.endswith("nex"):
-        r = NeuroExplorerIO(filename)
+        r = neo.NeuroExplorerIO(filename)
         seg = r.read_segment()
         return seg, nexevents
     else:

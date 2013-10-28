@@ -1,14 +1,16 @@
+from __future__ import absolute_import
+
 import os.path
 import random
 
 import numpy as np
 import quantities as pq
 from scipy import linalg
-from sim_io import get_seg
-from neo.core import AnalogSignal, EpochArray, EventArray
 from scipy import signal, stats
 from scipy.io import loadmat
 
+from .sim_io import get_seg
+from . import neo
 
 def correct_seq(e):
     return (e['press'], e['toneon'], e['release'], e['pumpon'])
@@ -78,8 +80,8 @@ def merge_all_eas(seg, channels):
         merged.extend(zip(seg.eventarrays[ix].times,
                           [channel] * len(seg.eventarrays[ix].times)))
     merged.sort()
-    return EventArray(map(lambda x: x[0], merged),
-                      map(lambda x: x[1], merged))
+    return neo.EventArray(np.array(map(lambda x: x[0], merged)),
+                          np.array(map(lambda x: x[1], merged)))
 
 
 def behaviour(seg, e):
