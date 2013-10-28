@@ -1,6 +1,6 @@
 import math
 import sys
-sys.path.append('trevor')
+sys.path.append('trevor/scripts')
 
 import nef
 from NEFBuilder import BaseReactionTask
@@ -53,8 +53,7 @@ class AdaptiveControl(DoubleIntegrator):
         net.connect('Press/Release', 'Holding',
                     pstc=0.01, transform=[[0.25, 0], [0, 0]])
         net.connect('Holding', 'Holding', pstc=0.05, transform=[1, 0],
-                    func=DoubleIntegrator.get_control_2d(
-                        self.mode, self.degrade, self.radius))
+                    func=self.dintfunc)
         net.connect('Holding', 'Trigger',
                     pstc=0.01, transform=[[1, 0], [0, 0]])
         net.connect('Trigger', 'Press/Release', pstc=0.01,
@@ -68,7 +67,7 @@ class AdaptiveControl(DoubleIntegrator):
         net.connect('Press/Release', 'Timer',
                     pstc=0.01, transform=[[0, 0], [-0.3, 0]])
         net.connect('Delay state', 'Trigger', pstc=0.01,
-                    func=AdaptiveControl.releasezone, transform=[1.0, 1.0])
+                    func=self.releasezone, transform=[1.0, 1.0])
 
     def make(self):
         net = nef.Network('Simple reaction time', seed=self.seed)
@@ -108,11 +107,7 @@ class AdaptiveControl(DoubleIntegrator):
         log.add("RTTask", origin="trigger", name="tone_event", tau=0.0)
 
     def filename(self):
-        if self.degrade is None:
-            return 'ctrl-%s-%d' % (self.control, self.seed)
-        else:
-            return 'ctrl-deg%d-%s-%d' % (
-                self._degrade, self.control, self.seed)
+        return 'ctrl-%s-%d' % (self.control, self.seed)
 
     def run(self, length):
         if self.net is None:
@@ -122,38 +117,30 @@ class AdaptiveControl(DoubleIntegrator):
         super(DoubleIntegrator, self).run(fname, length)
 
 if '__nengo_ui__' in globals():
-    ctrl = AdaptiveControl('simple', degrade=None, nperd=200, seed=None)
+    ctrl = AdaptiveControl('simple', nperd=200, seed=None)
     ctrl.view(True)
 
 if '__nengo_cl__' in globals():
     params = {
         'control': 'adaptive',
-        'degrade': None,
         'nperd': 200,
         'seed': None,
     }
 
     length = 200.
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2 or len(sys.argv) > 5:
         print ("Usage: nengo-cl NEFControl.py "
-               + "(simple|adaptive) [degrade length nperd seed]")
+               + "(simple|adaptive) [length nperd seed]")
         sys.exit()
 
     params['control'] = sys.argv[1]
     if len(sys.argv) >= 3:
-        try:
-            params['degrade'] = int(sys.argv[2])
-        except:
-            pass
+        length = float(sys.argv[2])
     if len(sys.argv) >= 4:
-        length = float(sys.argv[3])
-    if len(sys.argv) >= 5:
-        params['nperd'] = int(sys.argv[4])
-    if len(sys.argv) == 6:
-        params['seed'] = int(sys.argv[5])
-    if len(sys.argv) > 6:
-        print "Too many arguments. Ignoring extras..."
+        params['nperd'] = int(sys.argv[3])
+    if len(sys.argv) == 5:
+        params['seed'] = int(sys.argv[4])
 
     ctrl = AdaptiveControl(**params)
     ctrl.run(length)

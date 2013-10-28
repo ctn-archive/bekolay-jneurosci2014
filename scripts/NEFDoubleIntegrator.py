@@ -1,6 +1,6 @@
 import math
 import sys
-sys.path.append('trevor')
+sys.path.append('trevor/scripts')
 
 import nef
 from NEFBuilder import BaseReactionTask, MPFCModel
@@ -127,16 +127,7 @@ class DIntReactionTask(BaseReactionTask):
 
 
 class DoubleIntegrator(MPFCModel):
-    def __init__(self, degrade=None, nperd=200,
-                 mode=SimulationMode.DEFAULT, seed=None):
-        if degrade is None:
-            self.degrade = None
-        else:
-            self._degrade = degrade
-            if mode == SimulationMode.DIRECT:
-                self.degrade = degrade * 0.025
-            elif mode == SimulationMode.DEFAULT:
-                self.degrade = degrade * 0.01
+    def __init__(self, nperd=200,  mode=SimulationMode.DEFAULT, seed=None):
         self.nperd = nperd
         self.mode = mode
 
@@ -179,24 +170,19 @@ class DoubleIntegrator(MPFCModel):
             net.connect('Oscillation', 'Delaying',
                         transform=[0.02, 0], pstc=0.01)
 
-        if self.mode == SimulationMode.DEFAULT and self.degrade is not None:
-            weight_func = DoubleIntegrator.degradeweights(self.degrade)
-        else:
-            weight_func = None
-
         net.connect('Delaying', 'Delaying', transform=[1, 0], pstc=0.05,
-                    func=DoubleIntegrator.get_control_2d(
-                        self.mode, self.degrade, self.radius),
-                    weight_func=weight_func)
+                    func=self.dintfunc)
         net.connect('Timer', 'Timer', transform=[1, 0], pstc=0.05,
-                    func=DoubleIntegrator.get_control_2d(
-                        self.mode, self.degrade, self.radius),
-                    weight_func=weight_func)
+                    func=self.dintfunc)
 
         net.connect('Delaying', 'Delay state',
                     index_pre=0, index_post=0, pstc=0.01)
         net.connect('Timer', 'Delay state',
                     index_pre=0, index_post=1, pstc=0.01)
+
+    @staticmethod
+    def dintfunc(x):
+        return [x[0] * (x[1] + 1)]
 
     def make(self):
         net = nef.Network('Double integrator', seed=self.seed)
@@ -209,36 +195,6 @@ class DoubleIntegrator(MPFCModel):
         net.network.setMode(self.mode)
         self.net = net
         return self.net
-
-    @staticmethod
-    def control_4d(x):
-        return [x[0] * (x[2] + 1), x[1] * (x[3] + 1)]
-
-    @staticmethod
-    def get_control_2d(mode, degrade, rad):
-        def direct_control_2d(x):
-            d = 0.0 if degrade is None else degrade
-            val = x[0] * (x[1] + 1) * (1 - d)
-            if val > 0:
-                return min(val, rad)
-            else:
-                return max(val, -rad)
-
-        def spike_control_2d(x):
-            return [x[0] * (x[1] + 1)]
-        if mode == SimulationMode.DIRECT:
-            return direct_control_2d
-        elif mode == SimulationMode.DEFAULT:
-            return spike_control_2d
-
-    @staticmethod
-    def degradeweights(degrade):
-        def degweights(w):
-            for i in xrange(len(w)):
-                for j in xrange(len(w[0])):
-                    w[i][j] *= (1 - degrade)
-            return w
-        return degweights
 
     def log_nodes(self, log):
         log.add("Delay state", tau=0.1)
@@ -255,12 +211,7 @@ class DoubleIntegrator(MPFCModel):
         elif self.mode == SimulationMode.DIRECT:
             mode = 'direct'
 
-        if self.degrade is None:
-            return  'dint-%s-%s-%d' % (
-                mode, experiment, self.seed)
-        else:
-            return 'dint-deg%d-%s-%s-%d' % (
-                self._degrade, mode, experiment, self.seed)
+        return  'dint-%s-%s-%d' % (mode, experiment, self.seed)
 
     def run(self):
         if self.net is None:
@@ -281,7 +232,7 @@ class DoubleIntegrator(MPFCModel):
             super(DoubleIntegrator, self).run(fname, exp_length)
 
 if '__nengo_ui__' in globals():
-    dint = DoubleIntegrator(degrade=None, mode=SimulationMode.DEFAULT)
+    dint = DoubleIntegrator(mode=SimulationMode.DEFAULT)
     dint.make()
     dint.view(True)
 
@@ -289,28 +240,20 @@ if '__nengo_cl__' in globals():
     params = {
         'mode': SimulationMode.DEFAULT,
         'nperd': 200,
-        'degrade': None,
         'seed': None,
     }
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2 or len(sys.argv) > 4:
         print ("Usage: nengo-cl NEFDoubleIntegrator.py "
-               + "(direct|spikes) [degrade nperd seed]")
+               + "(direct|spikes) [nperd seed]")
         sys.exit()
 
     if sys.argv[1] == 'direct':
         params['mode'] = SimulationMode.DIRECT
     if len(sys.argv) >= 3:
-        try:
-            params['degrade'] = int(sys.argv[2])
-        except:
-            pass
-    if len(sys.argv) >= 4:
-        params['nperd'] = int(sys.argv[3])
-    if len(sys.argv) == 5:
-        params['seed'] = int(sys.argv[4])
-    if len(sys.argv) > 5:
-        print "Too many arguments. Ignoring extras..."
+        params['nperd'] = int(sys.argv[2])
+    if len(sys.argv) == 4:
+        params['seed'] = int(sys.argv[3])
 
     dint = DoubleIntegrator(**params)
     dint.run()
