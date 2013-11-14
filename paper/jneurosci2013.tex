@@ -13,12 +13,12 @@
 \usepackage{framed}
 \usepackage{inconsolata}
 \usepackage{hyperref}
-
+\usepackage{booktabs}
 \hypersetup{
   colorlinks = true, %Colours links instead of ugly boxes
   urlcolor = blue, %Colour for external hyperlinks
   linkcolor = blue, %Colour of internal links
-  citecolor = red %Colour of citations
+  citecolor = blue %Colour of citations
 }
 
 % Stuff to change, you know, if you want.
@@ -52,15 +52,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Make title
 \title{A spiking neural integrator model of the adaptive control of
-  action by the anterior cingulate cortex}
-\date{Abbreviated title: A spiking model of ACC adaptive control}
+  action by the medial prefrontal cortex}
+\date{Abbreviated title: A spiking model of mPFC adaptive control}
 \author{%
   Trevor Bekolay \\
   Centre for Theoretical Neuroscience \\
   University of Waterloo \\ ~ \\
   Mark Laubach \\
-  The John B. Pierce Lab \\
-  New Haven, CT \\ ~ \\
+  The John B. Pierce Lab and Dept. of Neurobiology \\
+  Yale University School of Medicine \\ ~ \\
   Chris Eliasmith \\
   Centre for Theoretical Neuroscience \\
   University of Waterloo}
@@ -74,9 +74,9 @@ Email: \url{celiasmith@uwaterloo.ca}.
 Centre for Theoretical Neuroscience, University of Waterloo.
 200 University Avenue West, Waterloo, ON, N2L 3G1.
 
-\textbf{Pages:} 24. \textbf{Figures:} 8. \textbf{Tables, multimedia, 3D models:} 0
+\textbf{Pages:} 32. \textbf{Figures:} 10. \textbf{Tables:} 2. \textbf{Multimedia, 3D models:} 0
 
-\textbf{Word counts:} Abstract: 164, Introduction: 445, Discussion: 479
+\textbf{Word counts:} Abstract: 199, Introduction: 486, Discussion: 1499.
 
 \textbf{Conflict of Interest}
 The authors declare no competing financial interests.
@@ -94,121 +94,133 @@ that were analyzed by TB and ML.
 \clearpage
 
 \begin{abstract}
-  Reaction times can be improved by preparing movements
-  in advance and by learning the expected timing
-  of action-imperative stimuli.
+  Subjects performing simple reaction time tasks
+  can improve reaction times by learning the expected timing
+  of action-imperative stimuli
+  and preparing movements in advance.
   Success or failure on the previous trial
-  can be an important factor for determining
-  whether an animal will attempt to time
-  the stimulus or simply wait for it to occur
+  is often an important factor for determining
+  whether a subject will attempt to time
+  the stimulus or wait for it to occur
   before initiating action.
-  The anterior cingulate cortex (ACC) has been implicated
+  The medial prefrontal cortex (mPFC) has been implicated
   in enabling the top-down control of action
   depending on the outcome of the previous trial.
-  Analysis of ACC activity suggests that
-  neural integration is a key mechanism
+  Analysis of spike activity from the rat mPFC
+  suggests that neural integration is a key mechanism
   for adaptive control in precisely timed tasks.
   We show through simulation
-  that a spiking neural circuit
+  that a spiking neural network
   consisting of coupled neural integrators
   captures the neural dynamics
-  of the experimentally recorded ACC.
-  We expand on this coupled integrator model
-  to construct a spiking neural circuit that
+  of the experimentally recorded mPFC.
+  Errors lead to deviations in the normal
+  dynamics of the system,
+  a process that could enable learning
+  from past mistakes.
+  We expand on this coupled integrator network
+  to construct a spiking neural network that
   performs a reaction time task by following
-  either a timing or cue-response strategy,
-  and show that it performs a simple reaction time task
-  with similar reaction times as experimental subjects.
+  either a cue-response or timing strategy,
+  and show that it performs the task
+  with similar reaction times as experimental subjects
+  while maintaining the same spiking dynamics
+  as the experimentally recorded mPFC.
 \end{abstract}
 
 \linespread{1.5}
 
 \section{Introduction}
 
-The anterior cingulate cortex (ACC) has been implicated
-in a wide variety of functions,
-including conflict monitoring
-\cite{Sheth2012,Aarts2009,Botvinick2004,VanVeen2004},
+The medial prefrontal cortex (mPFC) has been implicated in regulating reinforcement learning parameters
+\cite{Amiez2005,Khamassi2012},
+conflict monitoring
+\cite{Botvinick2004,VanVeen2004,Aarts2009,Sheth2012},
 performance monitoring
-\cite{Brown2005,Carter1998,Fecteau2003,Modirrousta2008,Rushworth2004,Histed2009,Hyman2013,Horst2012},
-anticipatory control \cite{Aarts2008,Koyama2001},
+\cite{Carter1998,Fecteau2003,Rushworth2004,Brown2005,Modirrousta2008,Histed2009,Alexander2011,Horst2012,Hyman2013},
+anticipatory control \cite{Koyama2001,Aarts2008},
 arousal of the sympathetic nervous system
 \cite{Critchley2003,Luu2003},
 and control of action timing
-\cite{Muir1996,Mulert2003,Naito2013,Narayanan2009,Risterucci2003}.
+\cite{Muir1996,Mulert2003,Risterucci2003,Narayanan2009,Naito2013}.
 Conceptual models have been proposed
-that would allow the ACC to be involved
+that would allow the mPFC to be involved
 in several of these functions,
 depending on behavioral context
-(e.g., \citenoparens{Botvinick2004,Luu2003}).
-However, while there have been
-attempts at modeling the ACC
-using artificial neural networks
-\cite{Botvinick2004,Brown2005},
-there are currently no mathematical
-accounts of ACC function that would
-explain the myriad of behaviors
-modulated by the ACC.
-As well, no existing models
-have been implemented with spiking neurons,
-and therefore no models can be analyzed
-with the same methods used
-to analyze single neuron recordings.
+(e.g., \citenoparens{Luu2003,Botvinick2004}).
+Mathematical models
+based on reinforcement learning
+explain experimental results
+at several levels
+(e.g., \citenoparens{Alexander2011,Khamassi2012}).
+However, these reinforcement learning models
+have not been shown to explain spiking activity
+of neural ensembles recorded during
+temporally constrained behavioral tasks.
+Here, we present a dynamical spiking neural model
+that relates directly to
+both neural and behavioral data
+in a simple mPFC-dependent task.
 
-In this paper, we propose that a
+Specifically, we propose a
 two-dimensional dynamical system
-can account for ACC activity
-related to error monitoring and motor action timing.
-We test the model in a simple reaction time task
-with a predictable foreperiod and
-show that the mathematical model
-enables precise timing of actions,
-and changes behavior depending
-on the outcome of the last trial.
-The dynamical system is based
-on a multi-dimensional attractor
-network proposed by \citetext{Singh2006},
-and is implemented in a spiking neural network
-using the Neural Engineering Framework
-(NEF; \citenoparens{Eliasmith2003}).
-We show, using identical analyses
-to those employed on the experimental data,
-that simulated neural activity from this circuit
-closely matches recorded ACC activity
-and that the model can be combined with
-a simple motor control model
-to produce behavior consistent
-with behavioral studies of simple reaction time tasks.
+that can account for mPFC activity
+related to error monitoring and action timing
+in rodents performing a simple reaction time task.
+Neural recordings in the motor cortex
+during the acquisition of this task
+reveal that an encoding of forthcoming errors
+develops with learning \cite{Laubach2000}.
+These activities depend on processing in the mPFC
+\cite{Narayanan2006Neuron},
+where neurons encode errors
+both prospectively and retrospectively
+\cite{Narayanan2006Neuron,Narayanan2008}.
+Analyses of population activity during the task
+show that both the mPFC and motor cortex
+are dominated by
+relatively slow fluctuations in firing rates,
+starting from the initiation of the trial
+and terminating when feedback is given
+about the trial's outcome
+\cite{Narayanan2009}.
 
-Our model also provides an alternative hypothesis
-of how the ACC accomplishes the control of action timing.
-\citetext{Narayanan2009} hypothesized
-that ACC activity inhibits motor responses
-until the time of the cue.
-Our model instead proposes that
-ACC activity encodes the duration of the action
-and that inhibition is carried out elsewhere.
-
-In this paper we apply our
-mathematical account of ACC function
-to explain error monitoring and
-the control of action timing.
-However, we suggest that the dynamical modelling
-method we employ is general and can be extended
-to explain other theories
-of high-level ACC function.
+Here, we show that a specific type of network structure,
+called a double integrator network \cite{Singh2006},
+can play a central role in
+accounting for reaction time task performance.
+With analyses identical
+to the experimental study,
+we show that the neural activity produced
+by the simulated spiking network closely matches
+the experimental data from the
+\citetext{Narayanan2009} study.
+Furthermore, we propose a feedforward control system
+that can perform the simple reaction time task
+and show that the double integrator network
+can be used to modify the behavior
+of the control system based on
+the outcome of the previous trial.
+When the control system is implemented
+in a spiking neural network,
+the modified behavior closely matches
+the behavior of experimental subjects
+performing the same reaction time task.
 
 \section{Methods}
 
-\subsection{The reaction time task} \label{sec:simple-rt}
+\subsection{Reaction time task} \label{sec:simple-rt}
 
-Twelve male Long-Evans rats
-were trained to press down on a lever
+The experimental data analyzed in this study is the same
+as that in \citetext{Narayanan2009},
+where more detailed explanation of the experimental
+methods can be found.
+In that study, twelve male Long-Evans rats
+were trained to press down a lever
 for a fixed amount of time (the ``foreperiod'';
 1 second for this study)
 using standard methods \cite{Laubach2000}.
-After the foreperiod, a cue is presented
-(an auditory tone).
+After the foreperiod, an auditory cue is presented.
 The subject then has 0.6 seconds (the response window)
 in which to release the lever.
 If the lever is released in that time,
@@ -218,44 +230,568 @@ If the lever is released during the foreperiod,
 the trial is classified as a ``premature error,''
 and is penalized by a time-out with the house lights extinguished.
 If the lever is not released within the response window,
-the trail is classified as a ``late error,''
+the trial is classified as a ``late error,''
 and is also penalized by a time-out with the house lights extinguished.
-Figure~\ref{fig1} presents a schematic view of the task.
-Subjects were considered to have learned the task
-when they performed in correctly $> 60 \%$
-of the time.
+Figure~\ref{fig1}A presents a schematic view of the task.
 
-The same reaction time task was simulated
+Rats included in the study reached performance criterion
+of $> 60 \%$ correct trials in 9.75 $\pm$ 1.5 sessions
+(1748 $\pm$ 343 trials).
+Microwire electrode arrays were then implanted
+into the prelimbic region of the rat cerebral cortex,
+which is generally considered to be
+part of the medial prefrontal cortex
+\cite{Laubach2011} and the anterior cingulate cortex
+in particular \cite{Medalla2009}.
+Data were recorded using
+a Plexon Many Neuron Acquisition Program
+for 3 sessions (567 $\pm$ 98 trials).
+
+\subsubsection{Simulation}
+
+In order to provide appropriate
+environmental input for
+the networks described
+in subsequent sections,
+the same reaction time task is simulated
+using a finite state machine.
+The task can be in one of seven states~($S$):
+trial start~(TS), foreperiod~(FP),
+timeout~(TO), cue~(C), response window~(R),
+reward~(Rw) and intertrial interval~(ITI).
+State transitions can be seen in
+the graphical depiction of
+the finite state machine in Figure~\ref{fig1}C.
+
+The auditory cue, house lights, and reward signals
+are provided by the environment
+based on the current task state.
+\begin{equation} \label{eq:env}
+  u_C =
+  \begin{cases}
+    1 &\text{if } S = \text{C} \\
+    0 &\text{otherwise}
+  \end{cases}
+  \quad
+  u_{TO} =
+  \begin{cases}
+    1 &\text{if } S = \text{TO} \\
+    0 &\text{otherwise}
+  \end{cases}
+  \quad
+  u_{Rw} =
+  \begin{cases}
+    1 &\text{if } S = \text{Rw} \\
+    0 &\text{otherwise}
+  \end{cases}
+\end{equation}
+The lever position does not depend on task state,
+but instead on press ($u$) and release ($u_r$)
+signals provided by a control system
+(see section~\ref{sec:control}).
+\begin{equation} \label{eq:lever}
+  L = \int [-u(t) + u_r(t)] \, dt
+\end{equation}
+
+\subsection{Double integrator network} \label{sec:dint}
+
+A key finding of the \citetext{Narayanan2009}
+study was that the temporal profiles
+of the leading principal component
+from the mPFC resembled the cumulative sum
+of the second component, and vice versa.
+This finding suggested that population activity
+in the mPFC might reflect a process of integration.
+Using the Nengo simulator \cite{BekolayInpress},
+a number of candidate networks
+were investigated and one particular network
+was found to resemble the dynamics
+of the mPFC recordings.
+This network is called a ``double integrator network,''
+and was first proposed in the context of working memory
+by \citetext{Singh2006}.
+We hypothesize that the double integrator network
+proposed by \citeauthor{Singh2006}
+will exhibit the same neural dynamics
+as the experimental mPFC
+when modified to respond
+to events occurring during the simple RT task.
+
+In order to test this hypothesis,
+we extend the double integrator network
+by providing it with multiple inputs
+that represent events occurring during
+the simple RT task
+(including those in Equation~[\ref{eq:env}]),
+while maintaining the same underlying dynamics.
+By driving the double integrator network
+to certain parts of the state space,
+we make it possible to predict
+the state of the system
+when the cue occurs during the
+reaction time task.
+
+\subsubsection{Dynamics} \label{sec:dynamics}
+
+The underlying dynamics of the double integrator network
+are captured in the following equations:
+\begin{align*}
+  \dot{x}_1 &= u \\
+  \dot{x}_2 &= \beta x_1,
+\end{align*}
+where $u$ represents an input signal
+and $\beta$ is a scalar parameter representing the strength of
+the connection between the two integrators.
+This results in a two-dimensional system
+in which $x_1$ integrates its input,
+maintaining the accumulated value over time, and
+$x_2$ integrates the value of $x_1$.
+This is the system proposed by \citetext{Singh2006},
+who predicted that this dynamical system is capable
+of time tracking;
+because $x_2$ integrates $x_1$,
+the amount of time elapsed since
+$x_1$ changes can be determined
+based on how much $x_2$ has changed.
+
+In \citetext{Singh2006}, neural recordings
+were analyzed during a single trial
+of the vibrotactile discrimination task.
+This corresponds to a single trial
+of the simple RT task
+in which the input, $u$,
+is the lever press,
+and the initial state, $x$, is $(0, 0)$.
+However, in the simple RT task we perform
+many consecutive trials.
+We therefore use other inputs from
+the environment to match
+the trajectories tracked by
+the experimental principal components
+(shown in Figure~\ref{fig2}).
+
+Since the principal components
+resemble the double integrator network
+in the post-correct case,
+we aim to reset the system to the origin point
+after correct trials.
+Figure~\ref{fig2}D indicates that
+the principal components return to their
+original state after approximately 2 seconds,
+which is the time at which
+the subject receives reward.
+Therefore, we hypothesize that
+the trial's outcome (i.e., reward delivery
+or a timeout) resets the system
+to some particular state,
+as proposed in \citetext{Narayanan2009}.
+In the case of reward delivery,
+we implement this hypothesis
+by using the reward delivery signal, $u_{Rw}$,
+to drive the system toward $(0, 0)$.
+\begin{align*}
+  \dot{x}_1 &= u - R \, u_{Rw} \, x_1 \\
+  \dot{x}_2 &= \beta x_1 - R \, u_{Rw} \, x_2,
+\end{align*}
+where $R$ is a scalar parameter
+indicating how strongly the system
+is driven to the origin point.
+
+In the post-error case,
+the principal components
+in Figure~\ref{fig2}D are
+not at the origin point.
+Since the lever press increases $x_1$,
+when $x_1 > 0$ we can conclude that
+the subject is currently performing the task.
+We therefore hypothesize that $x_1 < 0$
+indicates that an error has recently occurred.
+We implement this hypothesis
+by using the house lights signal,
+$u_{TO}$, to decrease $x_1$.
+\begin{equation} \label{eq:dint}
+  \begin{aligned}
+    \dot{x}_1 &= u - R \, u_{Rw} \, x_1 - E u_{TO} \\
+    \dot{x}_2 &= \beta x_1 - R \, u_{Rw} \, x_2,
+  \end{aligned}
+\end{equation}
+where $E$ is a scalar parameter
+controlling how quickly $x_1$ decreases.
+Note that $x_2$ is not directly driven by $u_{TO}$;
+however, because of the $\beta x_1$ term,
+$x_2$ will also decrease.
+
+Finally, Figure~\ref{fig2}D shows that
+the principal components are unstable
+during the intertrial interval.
+To model trial-by-trial cycles of
+excitability associated with task engagement,
+a slow oscillation ($\sim0.2$ Hz)
+was applied to the networks.
+The final dynamics of the double integrator are
+\begin{equation} \label{eq:dint-o}
+  \begin{aligned}
+    \dot{x}_1 &= u - R \, u_{Rw} \, x_1 - E u_{TO} + \sin(0.2 \cdot 2 \pi) \\
+    \dot{x}_2 &= \beta x_1 - R \, u_{Rw} \, x_2,
+  \end{aligned}
+\end{equation}
+where $\beta$, $R$, and $E$ are positive scalars.
+The effects of changing these free parameters
+are explored in Section~\ref{sec:params}.
+
+\subsection{Control networks} \label{sec:control}
+
+In order to evaluate the double integrator network's
+ability to influence action timing,
+we created a feedforward control network
+that performs the simple RT task
+by releasing the lever
+when the cue arrives;
+we refer to this feedforward system as the cue-responding network.
+We connected the double integrator network
+to the cue-responding network such that
+the lever can also be released
+by the double integrator network;
+we refer to this combined system as the adaptive control network.
+
+\subsubsection{Cue-responding network} \label{sec:cue-responding}
+
+The cue-responding network
+mimics how an experimental subject
+would react to the cue
+if the time of the cue cannot be predicted.
+The trial starts after
+the intertrial interval ends ($t_s$),
+at which point the lever is pressed.
+\begin{equation*}
+  u(t) =
+  \begin{cases}
+    1 &\text{if } t > t_s \text{ and } L > -1 \\
+    0 &\text{otherwise}.
+  \end{cases}
+\end{equation*}
+
+The lever is released
+once the cue occurs at $t_c$.
+\begin{equation} \label{eq:cue-responding}
+  u_r(t) =
+  \begin{cases}
+    1 &\text{if } t > t_c \text{ and } L < 1\\
+    0 &\text{otherwise}
+  \end{cases}
+\end{equation}
+
+\subsubsection{Adaptive control network}
+
+There is a fixed lower bound
+on reaction times in the cue-responding network
+based on the time taken to detect the cue
+and for $u_r$ to integrate to 1;
+with direct simulation of Equation~\eqref{eq:cue-responding}
+there is no delay between cue onset
+and cue detection,
+but in a spiking neural implementation
+there are signal transmission delays
+between each neural connection.
+Since the goal is to release the lever
+within the response window,
+the cue-responding strategy
+may be too slow if there are too many intervening
+connections between
+the neural population detecting the cue,
+and the neural population driving
+the muscles that eventually
+effect lever release.
+
+The double integrator network described
+previously can be combined with the
+cue-responding network to implement
+a faster strategy because
+the state of the dynamical system being tracked by
+the double integrator (Equation [\ref{eq:dint-o}])
+is approximately the same on each post-correct trial.
+If the previous trial was a correct trial,
+then the double integrator's state
+approaches (1, 1) as the time of the cue approaches,
+for some values of $\beta$.
+We therefore add an additional term
+that effects lever release
+if the predicted cue time is approaching.
+\begin{equation} \label{eq:release}
+  u_r = u_r + \frac{1}{1 + e^{-a (x_2 - b)}}
+\end{equation}
+The new term defines a sigmoid that increases
+from 0 to 1 when $x_2 \approx b$.
+The slope of the smooth increase
+from 0 to 1 is controlled by $a$;
+for very large $a$, the sigmoid
+is essentially a step function.
+We choose $a = 20$ and $b = 0.9$,
+which corresponds to a sigmoid
+that starts increasing
+when $x_2 = 0.6$ and reaches 1 when $x_2 = 1.2$.
+
+If the previous trial was an error trial,
+the double integrator
+will follow a different trajectory
+in which $1 / 1 + e^{-a (x_2 - b)} \approx 0$
+throughout the trial,
+and therefore the control system
+will only release the lever
+once the cue occurs.
+This allows the adaptive control network
+to adopt an aggressive prediction strategy
+if the last trial was successful,
+and to adopt a conservative cue-response strategy
+if the last trial was not successful.
+
+% It is likely that learning
+% takes place after error trials
+% in order to perform better
+% on subsequent trials.
+% Incorporating this in the adaptive control network
+% would be possible by modifying $\beta$
+% when errors occur;
+% however, that extension to the adaptive control network
+% is outside the scope of this paper.
+
+\subsection{Neural Engineering Framework} \label{sec:nef}
+
+The previous sections describe
+a dynamical system hypothesis
+of the mPFC and surrounding areas
+of cortex that together
+perform the simple reaction time task
+adaptively depending on the outcome
+of the previous trial.
+While these can be numerically simulated
+to observe ideal system behavior,
+we construct a spiking neural network
+implementing the above equations
+in order to test the hypothesis
+in a biologically plausible setting
+that approximates the direct numerical simulation.
+Testing this neural implementation
+allows us to determine if the approximation
+is able to perform the task
+in a manner comparable to the real brain
+by producing simulated neural data
+that can be compared directly with
+experimental neural data.
+We construct spiking neural networks
+using the principles of the Neural Engineering Framework
+(NEF; \citenoparens{Eliasmith2003})
 in the Nengo simulation environment
-using a finite state machine to track
-task state, and scalar values between -1 and 1
-to indicate the state of house lights,
-lever position, auditory cue, and reward.
-The Nengo scripts simulating this environment
-are available at
-\url{https://github.com/tbekolay/jneurosci2013}.
+\cite{BekolayInpress}.\footnote{The Nengo scripts and simulation
+  package simulating the networks and their environment are available
+  at \url{https://github.com/tbekolay/jneurosci2013/releases/tag/2013-11-29}.}
+Using the NEF, each signal
+from the dynamical systems above
+are represented with a population of spiking neurons,
+and transformed through the connections
+between those populations
+(see Figure~\ref{fig3}).
+
+The NEF enables the simulation of dynamical systems
+by making the assumption that populations of spiking neurons
+represent real-valued vectors,
+and using a least-squares optimal method
+to compute connection weights that
+transform those representations
+through the connections between
+populations of neurons.
+A population can have recurrent connections
+in order to produce dynamics,
+such as the integrative populations
+employed in this study.
+
+The NEF's representation scheme
+is a kind of population coding
+\cite{Georgopoulos1986,Salinas1994},
+extended to $n$-dimensional vector spaces.
+Each neuron in a population is sensitive
+to a particular direction,
+called the neuron's \textit{encoder}, denoted $\mathbf{e}$.
+The activity of a neuron can be expressed as
+\begin{equation} \label{eq:activity}
+  a = G[J(\mathbf{x})], \quad
+  J(\mathbf{x}) = \alpha \mathbf{e} \cdot \mathbf{x} + J_{bias} + J_\eta,
+\end{equation}
+where $G[\cdot]$ is a spiking nonlinear neural activation function,
+$\alpha$ is a scaling factor (gain) associated with the neuron,
+$\mathbf{e}$ is the neuron's encoder,
+$\mathbf{x}$ is the vector to be encoded,
+$J_{bias}$ is the background current of the cell
+when $\mathbf{x} = 0$,
+and $J_\eta$ is noise current injected
+to match experimental neural variability.
+The encoded value, $\mathbf{x}$,
+can be estimated linearly:
+\begin{equation*}
+  \mathbf{\hat{x}}(t) = \sum_i \mathbf{d}_i a_i(t),
+\end{equation*}
+where $a_i$ is the activity of neuron $i$
+and $\mathbf{d}_i$ is a decoding weight
+determined by solving a least-squares minimization
+of the difference between the decoded estimate
+and the actual encoded vector.
+
+The least-squares minimization is solved
+with the following equations.
+$\mathbf{X}$ is a set of samples from
+the representational range of
+$\mathbf{x}$ (e.g., samples from $\mathcal{U}(-1, 1)$
+in a typical scalar case).
+\begin{align*}
+  \mathbf{A} &= \begin{bmatrix}
+                 a_0(\mathbf{X}) \\
+                 a_1(\mathbf{X}) \\
+                 \vdots \\
+                 a_n(\mathbf{X})
+               \end{bmatrix} \\
+  \mathbf{d} &= \mathbf{\Gamma^{-1} \Upsilon}, \quad \text{where }
+  \mathbf{\Gamma} = \mathbf{AA^T} \quad \text{and } \mathbf{\Upsilon} = \mathbf{AX^T}
+\end{align*}
+
+Neural activity is interpreted as a
+filtered spike train.
+\begin{equation*}
+  a_i(t) = \sum_s h(t - t_s) = \sum_s e^{-(t - t_s) / \tau_{PSC}},
+\end{equation*}
+where $h(\cdot)$ is an exponential filter
+modeling postsynaptic current that is
+applied to each spike,
+and $s$ is the set of all spikes occurring
+before the current time $t$.
+
+Connection weights implementing a linear transform
+of the encoded vectors of a population
+can be computed as
+\begin{equation*}
+  \omega_{ij} = \alpha_j \mathbf{e}_j L \mathbf{d}_i,
+\end{equation*}
+where $i$ indexes the input population,
+$j$ indexes the output population,
+and $L$ is a linear operator.
+Nonlinear transformations can be computed
+by solving for decoders that minimize
+the difference between the decoded estimate and
+a function of the encoded vector;
+i.e., $\mathbf{\Upsilon} = \mathbf{A} f(\mathbf{X^T})$.
+
+Dynamical systems of the form
+$\dot{\mathbf{x}} = A(\mathbf{x}) + B(\mathbf{u})$
+can be implemented by connecting a population
+to itself with the linear operator
+$L = A$ on the recurrent connection,
+and receiving input $\mathbf{u}$
+from other populations and
+setting $L = B$ on those connections.
+
+The above principles are not dependent
+on a particular neuron model, $G[\cdot]$.
+In this study, we use the
+adaptive leaky integrate-and-fire (ALIF) model
+\cite{Koch1999} to match \citetext{Singh2006}.
+This model is governed by the equations:
+\begin{align*}
+  \frac{dV}{dt} &= - \frac{V (1 + RG_{adapt}) - J(\mathbf{x})
+    R}{\tau^{RC}} \\
+  \frac{dG_{adapt}}{dt} &= - \frac{G_{adapt}}{\tau_{adapt}} \\
+  \text{if } V > V_{th}&, \:\: G_{adapt} = G_{adapt} + G_{inc},
+\end{align*}
+where $R$ is the leak resistance,
+$\tau^{RC}$ is the RC time constant,
+and $G_{adapt}$ tracks how much
+the conductance is modulated over time.
+$G_{inc}$ and $\tau_{adapt}$
+are parameters affecting $G_{adapt}$.
+
+For each instance of each spiking neural network,
+the parameters of each ALIF neuron
+are randomly selected from
+a biologically plausible range
+(e.g., the maximum firing rate,
+$\mathcal{U}(10\text{Hz}, 50\text{Hz})$,
+produces average firing rates
+that match \citenoparens{Narayanan2009}).
+The encoders, $\mathbf{e}_i$, are
+randomly selected from
+a uniform distribution of directions
+in the encoded vector space.
+Table~\ref{tab:nef-param} summarizes
+the parameters specific
+to the neural implementation.
+All other parameters are described
+in Sections~\ref{sec:dint} and \ref{sec:control}.
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{cccccc}
+      \toprule
+      Maximum firing rate & $J_\eta$ & $\tau^{RC}$ & $\tau_{ref}$ &
+        $\tau_{adapt}$ & $G_{inc}$ \\
+      \midrule
+      $\mathcal{U}(10\text{ Hz}, 50\text{ Hz})$ &
+      $\mathcal{U}(-0.2\text{ nA}, 0.2\text{ nA})$ & 20ms & 1ms & 10ms &
+        $\mathcal{U}(0.001, 0.02)$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Parameters used in the neural implementation
+    of the double integrator and control networks.
+    Maximum firing rate and $J_\eta$ are ensemble-level parameters
+    as they apply to any neuron model $G[\cdot]$.
+    The maximum firing rate is used to determined the gain ($\alpha$)
+    and bias currents ($J_{bias}$) associated with neuron
+    (and used in Equation~[\ref{eq:activity}]).
+    All other parameters apply specifically to the ALIF neuron model.}
+  \label{tab:nef-param}
+\end{table}
 
 \subsection{Data analysis}
 
+Both experimental and simulated experiments
+produced data at the neural and behavioral levels.
+The analyses below were done
+on both experimental and simulated data,
+unless otherwise noted.
+
 \subsubsection{Neural data}
 
-The experimental data analyzed in this study is the same
-as that in \citetext{Narayanan2009}, in which
-the authors recorded the anterior cingulate cortex (ACC) and motor cortex
-of rodents performing this simple reaction time task.
-(The ACC recordings were made in the prelimbic cortex,
-which is a component of the ACC.
-The area was referred to as the dorsomedial PFC
-in the original paper.)
-\citeauthor{Narayanan2009} used principal component analysis
-(PCA) to characterize common firing patterns
-in the ACC during the task.
+Experimental spike trains from Long-Evans rats
+were determined by online identification
+with an oscilloscope and audio monitor,
+and offline spike sorting
+using Plexon software.
+Spike sorting was based on principal component analysis
+(PCA; described below) and waveform shape.
+In all, 174 single units were identified
+in rodent mPFC and analyzed together
+\cite{Narayanan2009}.
 
+Simulated spike trains were generated
+by the Nengo simulator.
+The populations representing signals
+in the double integrator and control
+networks (see Sections~\ref{sec:dint} and \ref{sec:control})
+contained 1200 adaptive leaky integrate-and-fire neurons
+(see Figure~\ref{fig3});
+174 of the neurons in an analyzed population
+were randomly selected
+in order to match the number of units
+from the experimental study.
+
+Spike trains are analyzed
+with principal component analysis (PCA),
+following procedures used in \citetext{Narayanan2009}
+to characterize common firing patterns
+in the mPFC during the task.
 In the PCA, only neurons with an average
 firing rate over 1 Hz are considered.
 Spike trains from 4 seconds prior to and 4 seconds after
-each press event on a correct trial are isolated.
-Each perievent spike train is binned in 1 ms bins and is then
+each press event are isolated.
+The perievent spike train is binned in 1 ms bins and
 convolved with a Gaussian filter ($\sigma = $ 25 ms;
 PCs are consistent with many other $\sigma$ values).
 These spike density functions
@@ -263,27 +799,28 @@ are normalized to Z-scores,
 and then averaged over all trials to
 produce a matrix in which each row is
 the normalized average response of a neuron
-over the perievent epoch.
+4 seconds before and after a lever press.
 Singular value decomposition
 is performed on that matrix
 to isolate the principal components,
-which are then normalized to Z-scores.
+which are normalized to Z-scores.
 The amount of variance accounted for
 by each principal component
 is computed as the square of the component's eigenvalue
 over the sum of all squared eigenvalues
 ($s_i^2 / \sum s^2$).
 
-As shown in Figure~\ref{fig2},
+As previously described in \citetext{Narayanan2009}
+and summarized in Figure~\ref{fig2},
 the first two principal components
 of the experimental data
-are modulated around the task events
+are modulated around the lever press
 and appear to track
 whether the subject has pressed the lever and
 the relative amount of time
 that the lever has been pressed.
 \citeauthor{Narayanan2009} also found that the neural activity
-in the ACC changed significantly depending on
+in the mPFC changed significantly depending on
 the outcome of the previous trial;
 the first two principal components
 change significantly after errors,
@@ -294,584 +831,318 @@ in order to adapt behavior based on the last trial.
 Interestingly, in the post-correct case,
 the first principal component
 is highly correlated with the integral
-of the second principal component,
-and vice versa.
+(i.e., cumulative sum) of the second principal component
+during the post-correct trial
+(Figure~\ref{fig2}E).
+Since the first two principal components
+account for over half of the variance
+in the neural data (Figure~\ref{fig2}B),
+we hypothesize that the mPFC
+represents the task state (PC1)
+and the integral of the task state (PC2).
+Implementing integration
+in a population of neurons has
+been widely explored
+\cite{Seung1996,Shadlen2001,Wang2002,Eliasmith2005}.
 In the post-error case,
-these correlations are significantly weaker.
-This result suggests that
-the ACC is performing some kind of integration,
-and that integration depends
-on prior behavioral outcomes.
+these correlations are significantly weaker,
+indicating that the integration
+taking place in the mPFC
+depends on prior outcomes.
+The firing patterns of individual neurons,
+related to the two leading PCs,
+are shown for post-correct trials in Figure~\ref{fig2}F.
+Nearly equal fractions of neurons
+became more or less active at times
+when the PCs were maximally positive or negative.
+In these plots, neural activity
+is synchronized to the start of the trial (time 0).
+The cue was presented at 1 second.
+The animals were required to respond
+to the cue with a reaction time less than 0.6 second,
+and feedback about the outcome
+was given approximately 0.1 second later.
+The range of feedback times are indicated
+near the upper right corner of each plot.
+Importantly, the trials used for this analysis,
+and shown in Figure~\ref{fig2}, were all correct trials.
+The only difference between trial types
+was the outcome of the previous trial
+(correct or incorrect).
+As in \citetext{Narayanan2008},
+neural activity did not track
+the type of error that occurred
+(premature or late).
+Population activity was not analyzed
+for these subtypes of errors,
+as they were present in unequal fractions of trials
+over rats and were much less frequent
+than the previously correct trials.
 
 \subsubsection{Behavioral data}
 
 In both the experimental and theoretical studies,
-the following relevant event times are recorded:
-lever press, lever release, reward delivery,
-trigger stimulus onset, and house light extinguishing.
-Sequences of event times were used to
-identify the result of each trial.
-Filtering the set of event timestamps
-for these sequences identifies each trial outcome.
+we record five relevant event times:
+lever press ($t_p$), lever release ($t_r$), reward delivery ($t_{Rw}$),
+cue onset ($t_c$), and house lights extinguishing ($t_{TO}$).
+A correct trial is identified by
+the sequence lever press, cue onset, lever release, reward delivery;
+a premature trial is identified by
+lever press, lever release, house lights extinguishing;
+and a late trial is identified by
+lever press, cue onset, house lights extinguishing.
+Trial outcomes are identified
+from the overall sequence of events
+by filtering for these sequences.
 Reaction times are calculated
 only for correct trials,
 and are defined as the difference between
-trigger stimulus onset and lever release.
-
-\subsection{Double integrator model}
-
-The double integrator model
-was proposed in the context of working memory
-by \citetext{Singh2006}.
-Their model uses multidimensional neurons
-in integrative populations
-to exhibit time-varying activity
-during a vibrotactile discrimination task.
-It relies on two coupled integrators,
-whose activity resembles
-the two strong principal components
-in the ACC data.
-The model employs
-the Neural Engineering Framework (NEF; \citenoparens{Eliasmith2003})
-to implement a spiking neural network
-that captures the dynamics of the
-integrative dynamical system.
-We hypothesize that a model
-similar to that proposed by \citeauthor{Singh2006}
-will exhibit the same neural dynamics
-as the experimental ACC in the simple RT task.
-
-\subsubsection{Dynamics} \label{sec:dynamics}
-
-The dynamics of the double integrator model
-are captured in the following dynamics equations:
-\begin{align*}
-  \dot{x}_1 &= u \\
-  \dot{x}_2 &= \alpha x_1,
-\end{align*}
-where $u$ represents an input signal
-and $\alpha$ is the strength of
-the connection between the two integrators.
-This results in a two-dimensional system
-in which $x_1$ integrates its input,
-maintaining the accumulated value over time, and
-$x_2$ integrates the value of $x_1$.
-\citetext{Singh2006} have proposed that this system
-enables time tracking.
-Because $x_2$ integrates $x_1$,
-the amount of time elapsed since
-$x_1$ changes can be determined
-based on how much $x_2$ has changed.
-
-In the simple RT task,
-we want to keep track of how much time
-has elapsed since the subject
-has pressed the lever.
-While the lever press event could be
-used as the input to the system,
-since we aim to embed this system
-in a spiking neural model,
-we instead use the activity of the motor neurons
-that effect the lever press as
-the input, $u$.
-The system is also modified by signals
-representing the outcome of a particular trial;
-on a correct trial, reward delivery ($R > 0$)
-resets the system to a starting state.
-On an error trail, a second input signal ($E < 0$)
-drives $x_1$ to a low state.
-When implemented in a spiking network,
-this causes $x_2$ to saturate at a low value,
-effectively breaking the integration,
-as is seen in Figure~\ref{fig2} in post-error trails.
-This results in the following overall dynamics.
-\begin{align} \label{dint}
-  \dot{x}_1 &= u + E - R x_1 \nonumber \\
-  \dot{x}_2 &= \alpha x_1 - R x_2.
-\end{align}
-See Figure~\ref{fig3} for a graphical
-depiction of the double integrator model.
-
-The dynamics of Equation \eqref{dint}
-are predictable for certain values
-of $\alpha$, $E$, and $R$.
-$\alpha$ defines how quickly
-the system drifts during the task;
-we set it such that $x_2 \approx 1$
-at the time of release,
-which occurs when $\alpha = 0.04$.
-If $R$ is sufficiently big,
-then when reward is delivered
-the system will be driven to the origin.
-This occurs when $\int_0^{t_R} R\,dt \ge 1$.
-We set the length of reward delivery,
-$t_R$, to 1 second to reflect the pace
-of the experimental subjects,
-and we set the reward magnitude,
-$R$, to 0.15 so that $\int_0^{t_R} R\,dt \ge 1$.
-Larger values of $R$ would be functionally identical,
-as $x_1 = x_2 = 0$ when $R \ge 0.15$ for $t_R$ seconds.
-If $E$ is sufficiently low,
-then when error is detected,
-the system will be driven to
-the lowest $x_1$ value that can
-be represented by the population
-of spiking neurons.
-This exploits the saturating nature
-of spiking neurons in order to
-obtain stability in this
-mathematically unstable system.
-If $\int_0^{t_E} E\,dt \le -1$,
-then the system will saturate
-at a low value for $x_1$.
-We set $t_E = 2 s$ and $E = -0.06$.
-
-To summarize, there are five parameters
-in this dynamical system:
-$t_R$ and $t_E$ are set based on the pace
-of experimental subjects;
-$R$ and $E$ have little behavioral
-consequence if $R \ge 0.15$ and
-$E \le -0.06$ and are set
-to match the experimental principal components;
-$\alpha$ is a free parameter
-that critically affects the model's success
-and is set such that $x_2 \approx 1$
-at the time of release.
-
-In addition to the above system,
-we inject a slowly oscillating signal into $x_1$.
-Having made the parameter choices
-described above,
-the system is stable during the intertrial
-interval in both post-correct and post-error
-cases.
-However, the experimental data shown in
-Figure~\ref{fig2} exhibits some activity during
-the intertrial interval;
-we capture this additional activity
-by introducing a simple oscillation,
-$O = \sin(2 \pi f t + \phi)$,
-where the frequency $f$ is low ($\le 0.4$Hz).
-While there is experimental evidence for
-a slow oscillations like $O$ in various brain regions
-\cite{Buzsaki2004}, this injected oscillation
-does not affect the behavioral performance of the network,
-but instead models ACC activity
-not being explicitly modelled in
-the remainder of the circuit.
-This activity could reflect
-other functions that the ACC is performing,
-or could reflect the overall pace
-of the simple RT task.
-The final dynamics are
-\begin{align} \label{dint-full}
-  \dot{x}_1 &= u + E + O - R x_1 \nonumber \\
-  \dot{x}_2 &= \alpha x_1 - R x_2.
-\end{align}
-
-\subsubsection{Neural Engineering Framework} \label{sec:nef}
-
-Equation~\eqref{dint-full} is implemented
-in a spiking neural network using
-the principles of the Neural Engineering Framework
-(NEF; \citenoparens{Eliasmith2003}).
-The NEF enables the simulation of dynamical systems
-like Equation~\eqref{dint-full} by
-making the assumption that populations of spiking neurons
-represent real-valued vectors,
-and using a least-squares optimal method
-to transform those representations
-through the connections between
-populations of neurons.
-A population can have recurrent connections
-in order to produce dynamics,
-such as the neural integrators
-employed in this study.
-
-The NEF's representation scheme
-is similar to population coding,
-as proposed by \citetext{Georgopoulos1986},
-but extended to $n$-dimensional vector spaces.
-Each neuron in a population is sensitive
-to a particular direction,
-called the neuron's \textit{encoder}.
-The activity of a neuron can be expressed as
-\begin{equation}
-  a = G[\alpha \mathbf{e} \cdot \mathbf{x} + J_{bias}],
-\end{equation}
-where $G[\cdot]$ is a nonlinear neural activation function,
-$\alpha$ is a scaling factor (gain) associated with the neuron,
-$\mathbf{e}$ is the neuron's encoder,
-$\mathbf{x}$ is the vector to be encoded, and
-$J_{bias}$ is the background current of the cell
-when $\mathbf{x} = 0$.
-The currently encoded value, $\mathbf{\hat{x}}$,
-can be estimated linearly:
-\begin{equation}
-  \mathbf{\hat{x}}(t) = \sum_i \mathbf{d}_i a_i(t),
-\end{equation}
-where $\mathbf{d}_i$ is the neuron's decoder,
-and $a_i$ is activity of neuron $i$.
-
-Neural activity is interpreted as a
-filtered spike train.
-\begin{equation}
-  a_i(t) = \sum_s h(t - t_s) = \sum_s e^{-(t - t_s) / \tau_{PSC}},
-\end{equation}
-where $h(\cdot)$ is the exponential filter
-applied to each spike,
-and $s$ is the set of all spikes occurring
-before the current time $t$.
-
-Decoders are found through a least-squares minimization
-of the difference between the decoded estimate
-and the actual encoded vector.
-\begin{equation}
-  \mathbf{d} = \Upsilon^{-1} \Gamma \hspace{1.8em}
-  \Gamma_{ij} = \int a_i a_j dx \hspace{1.8em}
-  \Upsilon_j = \int a_j \mathbf{x} dx.
-\end{equation}
-
-Connection weights to linearly transform these encoded vectors
-can then be computed as
-\begin{equation}
-  \omega_{ij} = \alpha_j \mathbf{e}_j L \mathbf{d}_i,
-\end{equation}
-where $i$ indexes the input population,
-$j$ indexes the output population,
-and $L$ is a linear operator.
-
-% We only do linear transformations I think?
-
-% Connection weights computing a function
-% between two populations connected in a feedforward manner
-% $f(\mathbf{x})$ can be determined by
-% solving for a set of decoding weights
-% for that function,
-% \begin{equation}
-%   \mathbf{d}^{f(\mathbf{x})} = \Upsilon^{-1} \Gamma \hspace{1.8em}
-%   \Gamma_{ij} = \int a_i a_j dx \hspace{1.8em}
-%   \Upsilon_j = \int a_j f(\mathbf{x}) dx,
-% \end{equation}
-% and then computing the following weight matrix, $\omega$;
-% \begin{equation}
-%   \omega_{ij} = \alpha_j \mathbf{e}_j L \mathbf{d}^{f(\mathbf{x})}_i,
-% \end{equation}
-% where $i$ indexes the input population,
-% $j$ indexes the output population,
-% and $L$ is a linear operator.
-
-Dynamical systems of the form
-$\dot{\mathbf{x}} = A(\mathbf{x}) + B(\mathbf{u})$
-can be created by connecting a population
-to itself with the linear operator
-$L = A$ on the recurrent connection,
-and receiving input $\mathbf{u}$
-from other populations and
-setting $L = B$ on those connections.
-
-These principles can be used for any neuron model,
-$G[\cdot]$. In this study, we use the
-adaptive leaky integrate-and-fire (ALIF) model
-to match \citetext{Singh2006}.
-For each instance of each model,
-the parameters of each ALIF neuron
-is randomly selected from within
-a biologically constrained range.
-The encoders, $e_i$, are randomly selected
-directions in the encoded vector space.
-All other parameters in the simulation
-are computed from these parameters,
-or are described in section \ref{sec:dynamics}.
-
-\subsection{Adaptive control circuit}
-
-\citetext{Narayanan2009} hypothesized
-that ACC activity could be used
-to inhibit motor responses
-until the time of the cue.
-An alternative view is that neuronal activity
-serves to encode the duration of the action
-and that inhibition is carried out elsewhere.
-To examine these hypotheses,
-we constructed a network that
-performs the simple RT task
-using the non-adaptive strategy
-of responding to cues.
-We then combined that network
-with the double integrator network
-to give an overall ``adaptive control circuit''
-that is able to switch between
-an aggressive timing strategy
-and a conservative cue-response strategy
-depending on the outcome of the previous trial.
-
-\subsubsection{Cue-responding circuit} \label{sec:cue-responding}
-
-The cue-responding circuit is composed
-of three populations
-of adaptive leaky integrate-and-fire neurons
-(see Figure~\ref{fig3}, grey box only).
-The population labelled \textit{Trigger}
-is sensitive to the cue.
-The population labelled \textit{Holding}
-tracks whether the lever is currently being held down.
-The population labelled \textit{Press/Release}
-causes lever presses and releases
-through activation of different subsets
-of its neurons.
-The actual lever press and release
-is delayed by $\sim$200ms,
-the approximate amount of time
-it takes for muscles to respond
-to sensory input \cite{Kawato1999}.
-
-The \textit{Holding} neurons project
-to the \textit{Trigger} population
-to provide the behavioral context
-(i.e., \textit{can} I release the lever?)
-The \textit{Trigger} neurons send projections
-to the \textit{Press/Release} neurons
-upon a cue that occurs in the correct context
-(i.e., \textit{should} I release the lever?)
-
-The context-driven design of this circuit
-provides an alternative theory to
-the prepotent inhibition model
-proposed by \citetext{Narayanan2009}.
-They suggest that a motor command
-is activated at the same time
-as an inhibitory waiting signal,
-and it is the removal of that inhibition
-that produces the motor command.
-This model proposes that
-an excitatory context signal is activated,
-and the pairing of that context signal
-with the cue produces the motor command.
-This leads to an alternative hypothesis
-for the function of ACC activity:
-the ACC tracks the behavioral context,
-and is able to inhibit or excite motor cortex,
-but does not always necessarily do so.
-
-\subsubsection{Adaptive control circuit}
-
-A weakness of the contextual cue-responding circuit
-is that there is a fixed lower-bound
-on the reaction time
-based on the time taken to detect the cue
-and for the delay between activation
-of motor cortex and muscle activity.
-Since the goal is to produce the action
-as close as possible to the time of the cue,
-the cue-responding strategy may be too slow,
-and so a predictive approach must be employed.
-
-The double integrator model described
-previously can be combined with the
-cue-responding circuit to implement such a strategy
-(see Figure~\ref{fig3}).
-The state of the dynamical system being tracked by
-the double integrator (Equation [\ref{dint-full}])
-is approximately the same each trial when the cue occurs.
-By connecting the output of the double integrator
-to the \textit{Trigger} population,
-the double integrator can cause a lever release
-when the state of the double integrator
-is slightly before the predicted
-time of the cue.
-
-However, if the previous trial was an error,
-the double integrator will not
-be following the trajectory
-that predicts the time of the cue,
-and therefore will not cause a lever release.
-The circuit then naturally
-uses the conservative
-cue-responding strategy.
-Switching between these two strategies
-depending on the outcome
-of the previous trial
-allows for adaptive control of action timing.
-A possible extension to this model
-would incorporate synaptic plasticity
-to change the recurrent connections such that
-the cue prediction would be better
-on subsequent trials.
+cue onset and lever release.
 
 \section{Theoretical results}
 
-\subsection{Model dynamics during the simple RT task}
-
-Here we describe the results of solving
-the dynamical system in equation \eqref{dint} directly
-(i.e., not using neurons).
+Here we describe the results of simulating
+the dynamical systems in Sections~\ref{sec:dint}
+and \ref{sec:control} directly.
 This provides a general characterization
 of the expected low-dimensional dynamics
 of the high-dimensional neural simulation.
-Figure~\ref{fig4} demonstrates that
-this dynamical system exhibits
-the behavior described in section \ref{sec:dynamics} during
-correct, premature, and late trials.
-Note that this figure depicts equation \eqref{dint},
-which does not have the oscillatory term $O$.
-The final position of
-the trajectory becomes the starting position
-of the next trial, and therefore
-provides information about
-the outcome of the last trial.
 
-It is clear from these trajectories
-that the time of the cue
-can be predicted,
-as the ACC is only in the predictive state
-when the cue occurs on correct trials.
-It is also clear that the
-outcome of the previous trials
-is easily decoded based
-on the state after the previous trial.
-Note that premature trials
+\subsection{The double integrator can predict cue time} \label{sec:params}
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{ccccc}
+      \toprule
+      $\beta$ & $R$ & $E$ \\
+      \midrule
+      0.44 & 2 & 0.5 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Parameters used to simulate the dynamical system
+    described in Equation~\eqref{eq:dint}.
+    Appropriate values were found through simulation;
+    see Figure~\ref{fig4}.}
+  \label{tab:sim-param}
+\end{table}
+
+The purpose of the double integrator
+is to predict the time at which the cue occurs.
+Figure~\ref{fig4} shows that this is possible.
+The parameter $\beta$ controls how fast
+the second dimension of the double integrator state
+($x_2$) increases (see Equation~\eqref{eq:dint}),
+resulting in different states at $t_c$
+(see Figure~\ref{fig4}B);
+since this parameter is encoded in the strength
+of the connection between the two integrators,
+this is a natural target for learning
+after errors.
+Given a particular value for $\beta$,
+the state of the system at the time of the cue,
+$t_c$, can be predicted given
+the initial conditions of the double integrator
+at the start of the trial;
+values at $t_c$ for $\beta=0.44$ are shown
+in Figure~\ref{fig4}A.
+
+The state of the system at the start of a trial
+(i.e., the initial conditions of the dynamical system)
+depend on the outcome of the previous trial.
+Equation \eqref{eq:dint} describes how the state changes
+based on the two possible outcomes,
+reward or light extinguishing.
+For sufficiently high values of $R$
+(see Figure~\ref{fig4}C),
+the system starts the next trial
+near the origin,
+resulting in the system predicting
+the time of the cue,
+and therefore employing the adaptive strategy.
+For sufficiently high values of $E$
+(see Figure~\ref{fig4}D),
+the system starts the next trial near $(-1, -1)$,
+resulting in the system being unable to predict
+the time of the cue (see Figure~\ref{fig4}A),
+and therefore employing the cue-responding strategy.
+Note that correct and error trials
+can be distinguished,
+and therefore used to modify behavior
+and drive learning;
+however, premature trials
 and late trials cannot be distinguished
-on the next trial;
-this is consistent with the results of
+on the next trial,
+which is consistent with the results of
 \citetext{Narayanan2009}.
 
-These theoretical results suggest that
-the underlying, low-dimensional dynamics
-of the postulated circuit
+Appropriate parameter values were determined
+using these simulations
+and used for all subsequent simulations,
+unless otherwise noted.
+The values used are listed in
+Table~\ref{tab:sim-param}.
+
+\subsection{The adaptive control network can react faster}
+
+Equation~\eqref{eq:release} defines a signal
+that causes the network to release the lever
+when the predicted cue approaches.
+Figure~\ref{fig5} shows a representative
+correct trial from the cue-responding
+and adaptive control networks,
+as well as a trial in which
+the cue was mispredicted,
+and the subsequent corrected trials
+following the error.
+Importantly, Figure~\ref{fig5}B
+shows the adaptive control network
+can release the lever
+at the exact time of the cue.
+
+\subsection{The double integrator state can drive learning}
+
+The state of the system reflects the outcome
+of the previous trial, and therefore
+can affect behavior on the next trial.
+The system can also be used to drive
+learning in order to maximize long-term reward.
+While the proposed system
+does not employ learning,
+previous work has proposed that the
+mPFC drives learning of action outcomes.
+Specifically, \citetext{Alexander2011} have proposed
+the PRO model, in which the mPFC tracks the predicted values
+of action outcomes in order to compute
+prediction errors that drive learning.
+While the signals tracked
+by the double integrator model
+exist to modify action timing,
+the signals used to drive learning
+in PRO can be computed from
+the double integrator model as well,
+as shown in Figure~\ref{fig6}.
+The only difference that cannot
+be attributed to the task
+is that the state is tracked throughout
+the trial in the PRO model,
+while in the double integrator,
+reward turns off the integrator
+responsible for tracking task state.
+Despite this difference,
+the similarity in signals
+tracked by the two models
+suggests that the double integrator,
+which we use to adaptively control action timing,
+can also be used to drive learning.
+
+\section{Simulation results}
+
+The above theoretical results suggest that
+the underlying low-dimensional dynamics
+of the postulated network
 should be appropriate
-for capturing the qualitative features of ACC activity.
+for capturing the qualitative features of mPFC activity.
 We now examine
 both the qualitative and quantitative fit
 of the high-dimensional spiking network
 to the recorded empirical data.
 
-\section{Simulation results}
+\subsection{The spiking double integrator has the same principal components as experimental data}
 
-\subsection{Spiking networks follow predicted trajectories}
-
-Figure~\ref{fig5} shows that
-the decoded values of a spiking neural network
-with the same dynamics as equation \eqref{dint-full}
-also take a similar trajectory through
-state space in correct, premature, and late trials.
-Despite the introduction of the oscillation
-and the additional noise present
-in spiking neural systems,
-behaviorally relevant states
-are significantly separated
-in the decoded state space of the spiking model.
-Therefore, the cue can be predicted,
-and the outcome of the previous trial
-has a significant effect
-on the trajectory taken during a trial.
-
-\subsection{The double integrator model has the same principal components as the experimental data}
-
-In order to perform an identical
-principal component analysis
-on the simulated data as was done
-on the experimental data,
-we adopted the methods of the original paper
-and randomly sampled 174 neurons
-with firing rates $> 1$ Hz from
-the spiking double integrator model.
-The spike trains of these neurons
-were convolved with the same Gaussian filter
-as used experimentally
-($\sigma = $ 25 ms)
-and then normalized to Z-scores.
-The results are shown in Figure~\ref{fig6}.
+Figure~\ref{fig7} compares
+the two leading principal components
+of the spiking implementation of the double integrator network
+to those of the experimental data.
 The simulated principal components
 are very similar to the experimental principal components
 \cite{Narayanan2009}:
-$R^2 = 0.96$ and $R^2 = 0.895$ for
-the first two components in the post-correct case,
-$R^2 = 0.979$ and $R^2 = 0.877$ for
-the first two components in the post-premature case,
-and $R^2 = 0.967$ and $R^2 = 0.862$ for
-the first two components in the post-late case.
-$R$ is a Pearson correlation coefficient in all cases.
+Pearson $R^2 = 0.82, 0.97, 0.95$
+for the first component
+and $R^2 = 0.91, 0.81, 0.84$
+for the second components in
+the post-correct, post-premature,
+and post-late trials respectively.
 
-\subsection{The adaptive control model explains observed performance}
+\subsection{A single integrator does not have the same principal components as experimental data}
 
-Figure~\ref{fig7} shows the performance
+We also performed principal component analysis
+on neural populations representing only one
+of the two dimensions tracked by
+the double integrator network.
+Figure~\ref{fig8}
+shows the results of the analysis
+for the population tracking $x_1$.
+While the first principal component
+closely matches the experimental data
+(Pearson $R^2 = 0.54, 0.86, 0.80$
+for post-correct, post-premature, and post-late
+trials respectively),
+the second principal component
+does not (Pearson $R^2 = 0.15, 0.26, 0.30$).
+This suggests that there exist
+neurons that are sensitive
+to both dimensions of the double integrator.
+
+\subsection{Spiking networks can predict the cue}
+
+Figure~\ref{fig9} shows that
+the decoded values of spiking neural networks
+implementing the cue-responding
+and adaptive control networks
+closely resemble the signals
+directly simulated with
+the dynamical system
+in correct, premature, and late trials.
+Despite the introduction of the oscillation
+and the additional injected noise current,
+the cue can be predicted,
+and the outcome of the previous trial
+has a significant effect
+on the system state during a trial.
+The spiking networks are capable
+of the adaptive control described
+in the theoretical results,
+as can be seen in Figure~\ref{fig9}A.
+
+\subsection{Adaptive control network matches observed performance}
+
+Figure~\ref{fig10} shows the performance
 of the experimental subjects,
-the model using only the cue-responding strategy,
-and the full adaptive model.
-The length of the simulations were
+the spiking cue-responding network,
+and the full spiking adaptive control network.
+The lengths of the simulations were
 varied to match the number of trials
 performed by subjects.
 The mean of the median reaction times
 is 272$\pm$48ms for the experimental subjects,
-368$\pm$34ms for the cue-responding models,
-and 260$\pm$100ms for the adaptive control model.
+365$\pm$24ms for the cue-responding models,
+and 240$\pm$62ms for the adaptive control model.
 The mean performance (\% correct trials) is
 70.8\% for experimental subjects,
-96.9\% for cue-responding models,
-and 84.0\% for adaptive control models.
+98.6\% for cue-responding models,
+and 92.5\% for adaptive control models.
 Therefore, only the adaptive control model
 has statistically indistinguishable reaction times
 compared to the experimental subjects.
-The cue-responding model is significantly slower,
-but makes fewer errors than the adaptive control model.
-
-\subsection{Cue prediction causes premature releases}
-
-Figure~\ref{fig8} shows the decoded values
-of neural populations during representative trials
-of the cue-responding and adaptive control circuits.
-In panel C, the double integrator model
-causes the control model to respond faster than
-the cue-responding strategy.
-Premature release never occurs with
-the cue-responding circuit alone.
-While this cannot be directly compared
-with the experimental data,
-as we cannot determine
-whether the experimental subject
-is attempting to
-predict the time of the cue,
-it suggests that more premature
-releases will occur when the time of the cue
-can be predicted;
-if the foreperiod randomly varied, for example,
-our model predicts that fewer premature
-releases would occur.
+The cue-responding network is significantly slower,
+but makes fewer errors than the adaptive control network.
+Both simulated models make fewer errors
+than experimental subjects.
 
 \section{Discussion}
 
-Our results indicate that the double integrator model
-allows for adaptive control of action timing.
+Our results show that a spiking implementation
+of the double integrator network
+\cite{Singh2006} can reproduce the dynamics
+of population activity in the rat mPFC
+\cite{Narayanan2009} and can be
+used to modify a feedforward control system
+in order to adaptively control
+the timing of actions.
 The ability to predict the time of the cue
 produces faster reaction times at the cost
 of additional premature errors.
-The model that enables this adaptive control
-has very similar neural dynamics
-as the experimental ACC.
-
-One important difference between
-the experimentally recorded and simulated ACC
-is in the amount of variance
-explained by the principal components
-and the lack of noise in
-spike densities (see Figure~\ref{fig6}).
-The relative cleanness of the simulated data
-is expected for several reasons.
-Primarily, we expect that the ACC
-is sensitive to many other factors
-than are represented in the simulation.
-The simulated data is more analogous
-to the 174 neurons in the entire ACC
-that are modulated the most during the simple RT task,
-rather than the 174 neurons that happened
-to be recorded during the experiments.
-Increased variability could be simulated
-by either injecting
-noise into the simulation,
-or by representing additional
-randomly varying dimensions.
 
 An interesting feature of the model
 is that there is significant randomness
@@ -879,49 +1150,266 @@ involved in model generation (see section~\ref{sec:nef}).
 This results in significant variability
 in the performance of simulated subjects,
 despite all but one performing the task well
-(see Figure~\ref{fig7}).
-Also interesting is that the model is
-not plastic; the weights determined
+(see Figure~\ref{fig10}).
+Also notable is that the model
+does not employ learning:
+the weights determined
 before the simulation do not change.
 The ability to keep track of the state
 of the system over time through recurrent connections
 is what enables the model to adapt.
-This points to a need for models to
-differentiate between adaptability
-due to recurrent activity
-and adaptability due to
-synaptic weight changes.
+By defining the dynamics of other tasks
+and implementing them
+in recurrently connected neural networks,
+we can start to form general theories
+of how biological systems can learn
+to perform complex tasks.
 
-While we have tested our mathematical model
-of ACC function in the context of
-control of action timing in a simple RT task,
-the tracking of behavioral variables
-in a dynamical system could be used
-to perform many of the other high-level functions
-that the ACC is theorized to perform.
-For example, in the commonly studied Stroop task,
-the state space being tracked by
-the ACC could be the difference between
-the response suggested by word-reading and the
-response suggested by the color;
-the context in which colors should be read
-would be reflected in the passive dynamics
-of the ACC, which would push the ACC
-to increasingly drift towards a state
-that compensates for the word-reading response.
-Similar mappings could be proposed
-for a wide variety of ACC-monitored tasks.
+\subsection{Relation to other models}
 
-In conclusion, we have shown that neural integration
-is likely a key mechanism in the ACC's
-ability to control the timing of actions.
-Analysis of the activity of a neural integrator
-model closely matches that of the experimentally recorded ACC.
-That model is sufficient to allow
-a simple cue-responding network
-to react more quickly at the cost
-of additional errors,
-which matches the performance of experimental subjects.
+In this study, we make
+an adaptive control hypothesis
+of mPFC function in reaction time tasks.
+This hypothesis is compatible
+with previous hypotheses suggesting
+that the mPFC plays a role
+in the regulation of
+reinforcement learning parameters.
+One such example is the PRO
+model by \citetext{Alexander2011}
+(though these arguments also
+apply to related models,
+such as \citenoparens{Khamassi2012}).
+The PRO model proposes that the mPFC
+is involved in a form of
+temporal difference learning.
+As shown in Figure~\ref{fig6},
+the positive and negative reward prediction error
+computed by PRO can also be computed
+by the double integrator,
+assuming that the value function
+learned by the system steadily increases.
+
+In our model, we interpret the steadily increasing
+signal as representing time elapsed rather
+than value over time;
+this means that there is only one parameter
+that must be learned
+($\beta$, the speed at which $x_2$ increases),
+rather than learning the value at every timestep
+in the simulation.
+In addition to being an easier target for learning,
+we further suggest that time tracking
+is a more natural interpretation for
+such a ramping signal.
+Theoretically, it is more likely that
+the value signal associated with those
+prediction errors is constant
+over time rather than steadily increasing
+\cite{Niv2008}.
+We suggest that the ramping signal
+shown in \citetext{Alexander2011} might
+reflect the temporal dynamics of the task
+instead of serving as a value signal.
+
+The model presented in this study keeps track
+of the results of the previous trial,
+and therefore can only learn
+on a trial-by-trial basis.
+Some quantities like volatility,
+which is thought to be encoded
+in the mPFC \cite{Behrens2007},
+would require additional integrative
+populations to aggregate information
+across many trials.
+While we have not presented
+such a model in this study,
+we believe that a similar dynamical approach
+can be used to construct models
+that encode volatility
+and other quantities
+in spiking neural networks,
+which can be directly compared
+to neural recordings.
+
+\subsection{Adaptation and learning}
+
+A primary difference between
+the adaptive control network we have presented
+and previous hypotheses of mPFC function
+is that we do not employ learning
+to change connection weights
+during a simulation.
+Instead, we achieve adaptive behavior
+through recurrently connected
+integrative populations that
+maintain information across trials.
+We believe that this type of adaptability
+should be explored in more depth in mPFC models.
+
+We are able to construct a spiking neural network
+that performs the simple RT task
+because we have made a hypothesis of the
+dynamics governing the task.
+One issue that we have not attempted to address
+in this work is how those dynamics
+could be learned from the sensory
+information available during the task.
+We believe that this learning procedure
+is central to understanding the mPFC,
+and the brain in general.
+However, in order to characterize
+this learning procedure,
+we must first have examples
+of the endpoints of the learning procedure.
+We believe that
+the adaptive control network,
+which uses the double integrator
+to predict cue times,
+is an example of one possible endpoint.
+By understanding the dynamics
+of other tasks and how those dynamics
+might be implemented in spiking neural networks,
+we can begin to form theories of
+how spiking neural networks
+performing complex tasks might be learned.
+In previous work, we have demonstrated
+that a spike-based learning rule
+can generate a neural integrator
+like those used in this study \cite{Macneil2011},
+but learning the entire network
+described here is the subject of future work.
+
+\subsection{Limitations}
+
+Our model is specific to the simple reaction time task
+being performed by the experimental subjects,
+and therefore can only be directly
+applied to experimental data
+of subjects performing this task.
+However, we believe that the
+methods used to determine the
+dynamical system governing the task
+and to implement the dynamical system
+in a spiking neural network
+are general,
+and can be used to explain many other tasks.
+Determining the dynamics of other tasks
+in a dynamical systems framework
+can help identify general principles
+of neural function.
+
+Even in the context of the simple reaction time task,
+our model cannot be directly compared
+to all of the experimental data available.
+We have chosen to implement the model
+in a spiking neural network,
+as we believe that it provides the most
+direct comparison to
+the data recorded from the biological system.
+However, because the mappings from
+spiking activity to EEG and fMRI recordings
+are not well understood,
+we cannot directly explain
+the wealth of data from humans performing
+similar reaction time tasks.
+Previous studies of mPFC function
+in humans have found evidence
+for low-frequency rhythmic activity being
+generated when mistakes are made
+and on trials after such errors
+\cite{Cavanagh2009}.
+A recent study reported the same types
+of error-encoding cortical rhythms
+in rat mPFC \cite{Narayanan2013}
+and showed that mPFC activity constrains
+rhythmic activity in motor cortex.
+It has been suggested that the expression
+of these rhythms reflects alterations
+in cross-laminar processing
+\cite{Carracedo2013}.
+These effects could be examined by
+using specific models for different
+cell types and laminar patterns
+for connecting neurons together.
+
+\subsection{Predictions}
+
+Unlike previous mPFC models,
+we predict that mPFC inactivation
+negatively impacts behavioral performance
+of tasks that require precisely timed actions,
+in addition to disrupting
+the learning of such tasks.
+
+At the neural level,
+the spiking implementation
+of the network predicts that
+neurons in the mPFC will ramp up in activity
+over the course of a goal-directed task.
+However, we predict that those ramping signals
+are an attempt to encode
+the temporal dynamics of the task,
+not an attempt to encode action-outcome values.
+This prediction could be tested
+by recording neural ensembles
+in the mPFC and motor cortex during learning.
+One important study would be to record
+the mPFC of naive rats,
+as was done in the motor cortex
+in \citetext{Laubach2000}.
+In that earlier study, a major limitation
+was that the rats only experienced
+brief foreperiods (400--600ms) before
+the trigger stimulus, and ramping activity
+was not apparent in the PCA-style analyses
+(unpublished observations).
+A better test of this idea would be to extend
+the required timing of the action to 1 second
+and record in the two cortical areas simultaneously.
+Neural integration could develop with the increased
+length of the foreperiod,
+and the rate of integrator ``ramping''
+might track the animals' prediction of the cue time.
+Alternatively, recordings could be made
+in well-trained rats who experience
+two foreperiods presented in blocks.
+We predict that the rate of integration
+would change following block changes,
+e.g. as the foreperiod switches from
+relatively long to short.
+To our knowledge, no studies like these
+have been done.
+
+We have shown that neurons
+in mPFC are tuned to multiple aspects
+of the simple RT task
+(see Figures~\ref{fig7} and \ref{fig8}).
+Since we find neurons that are sensitive
+to both task state ($x_1$) and the
+length of time in that state ($x_2$),
+we predict that single neurons
+would be sensitive to additional
+aspects of the task in more complex tasks.
+This is due to the mPFC as a whole
+tracking the dynamics of that task
+in order to modify behavior.
+Initial support for this idea
+can be found in a recent study
+of the mPFC that used
+a delayed spatial alternation task
+and found similar dynamics
+in principal component space across
+the mPFC ensembles \cite{Horst2012}.
+This prediction could be further tested
+by using a task that
+has different temporal dynamics
+in different trial blocks or task contexts,
+and determining if there are neurons
+with loadings on many primary components
+in a principal component analysis.
+One such task was used by
+\citetext{Delatour2001}.
 
 \bibliographystyle{namedplus}
 \bibliography{jneurosci2013}
@@ -935,14 +1423,26 @@ which matches the performance of experimental subjects.
 The simple reaction time task used in the experiment.
 Trials are classified as correct, premature, or late
 depending on the time of lever release.
+The times at which important events occur
+in the trials are labeled.
+In order, $t_s$ is the start of the trial,
+$t_p$ is when the lever is fully pressed,
+$t_c$ is the time of the auditory cue,
+$t_{Rw}$ is when reward is delivered,
+$t_{TO}$ is when house lights are extinguished,
+and $t_{ITI}$ is the start of the intertrial interval.
+(A) Schematic of each trial type.
+(B) Results of simulating each trial type
+according to Equation~\eqref{eq:env}.
+(C) Finite state machine tracking
+task state in the simulation.
 
 \paragraph{Figure 2}
 
 A summary of the principal component analysis done
-in \citetext{Narayanan2009};
-the motivation for investigating \citetext{Singh2006}.
+in \citetext{Narayanan2009}.
 (A) A graphical summary of principal component analysis.
-Nomarlized perievent neural data,
+Normalized perievent neural data,
 in the form of the Z-scores of instantaneous firing rates,
 is organized in a matrix, with each row
 being the Z-scored firing rates
@@ -973,7 +1473,7 @@ The varied lines criss-crossing each other
 suggest that each individual neuron
 has different sensitivities
 to the first and second principal components.
-(D) The top three principal components
+(D) The top two principal components
 for the post-correct trials (black)
 and the post-error trials (red).
 (E) (Top) Plotting the cumulative sum (integral)
@@ -986,7 +1486,7 @@ the first two principal components are no longer
 cumulative sums of each other
 (Pearson $R^2 = 0.639$ and $R^2 = 0.676$).
 This points to neural integration
-as a potential mechanism explaining ACC activity.
+as a potential mechanism explaining mPFC activity.
 (F) Normalized spike-density functions
 for all of the neurons analyzed in the post-correct case,
 organized by the loading
@@ -995,109 +1495,134 @@ organized by the loading
 
 \paragraph{Figure 3}
 
-Block diagram of the adaptive control model.
+Block diagram of the adaptive control network.
 (Left) The adaptive control model contains
-the double integrator model,
+the double integrator network
 from \citetext{Singh2006}.
 It has been modified by accepting
 both press information ($u$)
-and error information ($E$)
+and error information ($E \; u_{TO}$)
 to drive $x_1$, and
-reward information ($R$)
+reward information ($R \; u_{Rw}$)
 to control the integration
 of both $x_1$ and $x_2$.
-The output of the double integrator,
-colored red, is the only component
-that interacts with the cue-responding
-circuit, by activating neurons
-in the \textit{Trigger} population.
-(Middle) The cue-responding circuit
-that is able to perform
+Lines terminating with circles indicate
+negative connections;
+lines terminating with arrowheads indicate
+positive connections.
+The output of the double integrator
+is the only component
+that interacts with the cue-responding network.
+(Middle) The cue-responding network
+is able to perform
 the simple reaction time task
-by responding to the Cue
+by responding to the Cue ($u_C$)
 provided by the environment
-(see section \ref{sec:cue-responding}).
+(see the text, Section \ref{sec:cue-responding}).
 (Right) Values that are not modeled
 with spiking neural populations,
 and are therefore considered
 signals that are provided by the environment.
 The lever accepts the decoded
-output of the \textit{Press/Release} population,
-lowering after \textit{Press} sensitive
-neurons are activated (following some delay),
-and raising after \textit{Release} sensitive
-neurons are activated (following the same delay).
+output of the cue-responding network.
 
 \paragraph{Figure 4}
 
-A detailed breakdown of the dynamics and
-trajectory the model takes through state space
-for (A) correct, (B) premature, and (C) late trials
-following a correct trial.
-The injected oscillation is omitted
-in these plots;
-its time dependence makes it misleading
-to draw vector fields for a particular time.
-(A) In a correct trial, the pressing of the lever
-sends the double integrator model's state into
-the upper part of the state space.
-The connection between the two integrators
-causes the passive dynamics (panel 2)
-to push the state towards the right.
-The cue is delivered while drifting
-to the right, and the release occurs
-in the upper-right portion of the state space.
-After successful release,
-the reward turns off both integrators,
-causing the system to return to the origin point,
-where it remains until the next trial.
-(B) In a premature trial, the lever is released
-prior to the onset of the cue (panel 2).
-Premature release causes
-the house lights to extinguish,
-which drives the system to
-a point in the lower part of the state space.
-Between trials (panel 4),
-the passive dynamics of the state space
-drive the system to the lower-left portion
-of the space, where it will be
-at the start of the next trial.
-(C) In a late trial, the cue occurs,
-but the lever is not released (panel 2).
-Late release causes
-the house lights to extinguish,
-which drives the system
-to a point in the lower part of the state space.
-Between trials (panel 4), the passive dynamics
-of the state space drive the system
-to the same lower-left portion of the space
-that premature errors result in.
-Therefore, late and premature errors
-cannot be distinguished on the next trial.
+Time tracking in the double integrator model.
+$x_2$ (solid black line) ramps up over time,
+enabling the network to predict
+the time of the cue.
+Time labels indicate important events during each trial.
+$t_s$ is the start of the trial,
+$t_p$ is when the lever is fully pressed,
+$t_c$ is the time of the auditory cue,
+$t_{Rw}$ is when reward is delivered,
+$t_{TO}$ is when house lights are extinguished,
+and $t_{ITI}$ is the start of the intertrial interval.
+(A) The state of the system at $t_c$
+depends on the initial state of the system
+at the start of the trial, $t_p$.
+The initial state depends on the outcome
+of the previous trial;
+after a correct trial
+the system should start at $(0, 0)$,
+and after a premature or late trial,
+the system should start at $(-1, -1)$.
+(B) The slope of the ramping signal $x_2$
+depends on the parameter $\beta$, which
+represents the strength of the connection
+between $x_1$ and $x_2$.
+An ideal $\beta$ pushes $x_2$ far from
+the initial state,
+but within the representational range
+of a population of spiking neurons,
+which is normalized to $(-1, 1)$;
+therefore, the system should approach $(1, 1)$
+at the time of the cue,
+which occurs when $\beta \approx 0.44$.
+(C) The system is reset to $(0, 0)$
+after a correct trial by reward feedback.
+The parameter $R$ controls
+the strength of the reward feedback;
+the system is properly reset
+if $R \ge 2$.
+(D) The system is driven near $(-1, -1)$
+after an error trial by error feedback.
+The parameter $E$ controls
+the strength of the error feedback;
+the system is driven near $(-1, -1)$
+if $E \ge 1$.
 
 \paragraph{Figure 5}
 
-Decoded values of the double integrator model
-simulated in spiking neurons.
-The spiking neural model takes
-very similar trajectories through state
-space as the mathematical model (see Figure~\ref{fig4}).
-Similar to the mathematical model,
-the spiking model represents a very different state
-after correct (left) and error (middle, right)
-trials.
+Results of control network simulations.
+Time labels indicate important events during each trial.
+$t_s$ is the start of the trial,
+$t_p$ is when the lever is fully pressed,
+$t_c$ is the time of the auditory cue,
+$t_{Rw}$ is when reward is delivered,
+and $t_{TO}$ is when house lights are extinguished.
+(A) The cue-responding network.
+The release, $u_r$ is initiated only after cue onset, $t_c$.
+(B) The adaptive control network in the ideal case.
+The release is initiated such that
+the lever (dashed black line) is raised
+at the time of cue onset.
+(C) A premature release in the adaptive control network.
+The release is initiated before the time of cue onset
+(premature release is emulated by setting $\beta = 0.94$).
+(D) The adaptive control network follows
+the cue-responding strategy after error trials,
+due to the initial state of the double integrator.
 
 \paragraph{Figure 6}
 
+
+(Left) Signals tracked by the PRO model \cite{Alexander2011}.
+(Right) Signals tracked by or computed from
+the double integrator network.
+In all but one case, the signals are similar,
+and differ mainly in task-related properties
+(e.g., the length and magnitude of the reward signal).
+In both models, all signals can be represented
+as vectors if appropriate for the task.
+The one divergent case is the state;
+in the PRO model, the state signal
+persists after the reward has been delivered,
+but in the double integrator network
+is turned off by the reward.
+
+\paragraph{Figure 7}
+
 Results of principal component analysis
 on the data generated by the double integrator model
-for correct presses in (A) post-correct trails,
+for correct presses in (A) post-correct trials,
 (B) post-premature trials, and (C) post-late trials.
 The top row of panels compares
 the top two principal components
-of the model to those of the experimental ACC data.
+of the model to those of the experimental mPFC data.
 In all cases, the PCs are significantly similar
-(Pearson $R^2 > 0.86$).
+(Pearson $R^2 > 0.8$).
 The middle row of panels shows normalized
 peri-event spike densities
 for 174 randomly sampled neurons from the
@@ -1111,9 +1636,48 @@ compared in the middle and bottom rows
 are similar, although the recorded neuron responses
 are more variable over time.
 
-\paragraph{Figure 7}
+\paragraph{Figure 8}
 
-Behavioural performance of the
+Results of principal component analysis
+on the data generated by the integrator
+tracking $x_1$ in the double integrator model
+for correct presses in (A) post-correct trials,
+(B) post-premature trials, and (C) post-late trials.
+The top row of panels compares
+the top two principal components
+of the model to those of the experimental mPFC data.
+In all cases, the first PC is significantly similar
+(Pearson $R^2 > 0.5$),
+but the second PC is not (Pearson $R^2 \le 0.3$).
+The bottom row of panels shows normalized
+peri-event spike densities
+for 174 randomly sampled neurons from the
+simulated integrator population.
+
+\paragraph{Figure 9}
+
+(A) Decoded values of representative trials of
+the control networks simulated with spiking neurons.
+From top to bottom, the trials shown are
+a correct trial in the cue-responding network,
+a late trial in the cue-responding network,
+a correct trial in the adaptive control network,
+and a premature trial in the adaptive control network.
+(B) The decoded value of the double integrator network
+that is embedded in the adaptive control network
+on a correct trial following a correct trial.
+The system starts ($t_s$) and finishes ($t_{ITI}$)
+the trial near the origin point.
+(C) The decoded value of the double integrator network
+on a correct trial following an error trial.
+The system starts near the lower left
+portion of the state space,
+but since the trial was correct,
+finishes near the origin point.
+
+\paragraph{Figure 10}
+
+Behavioral performance of the
 experimental subjects and
 the cue-responding and adaptive control models.
 The top row of panels summarizes the number of
@@ -1125,65 +1689,15 @@ matched to the experimental subjects.
 The bottom row of panels summarizes the reaction times
 on correct trials for each subject.
 The dotted black line represents
-the mean of all subjects' median reaction times.
+the mean of all subjects' median reaction times
+(272$\pm$48ms for the experimental subjects,
+365$\pm$24ms for the cue-responding models,
+and 240$\pm$62ms for the adaptive control models).
 
-\paragraph{Figure 8}
-
-Decoded values from representative trials.
-The labels above denote events;
-`P' is a lever press event,
-`C' is a cue onset event,
-`R' is a lever release event,
-`E' is an error delivery event,
-and `Rw' is a reward delivery event.
-Names of the decoded signals correspond
-to the names of populations in Figure~\ref{fig3}.
-(A) A correct trial using the cue-responding circuit.
-In the cue-responding network, the trigger neurons
-activate only once the cue is delivered.
-Trigger neurons activate the release neurons,
-which initiate the release of the lever.
-There is a delay ($\sim 250ms$)
-between the activation of release neurons
-and the actual release of the lever.
-(B) A correct trial using the adaptive control circuit.
-In the adaptive network, when
-in the appropriate state, the cue
-can be predicted by the double integrator model,
-causing the activation of trigger---and
-therefore release---neurons before
-the time of the cue. This results
-in a faster reaction to the cue.
-(C) A premature trial using the adaptive control circuit.
-Premature release occurs when
-the double integrator model incorrectly predicts
-the time of the cue.
-This occurs when integration is too fast,
-and the trigger neurons are activated
-such that a lever release is effected
-before the time of the cue.
-Note that the non-adaptive cue-responding
-circuit cannot make premature releases,
-because releases are critically dependent
-on cue information.
-(D) A late trial using the cue-responding circuit.
-Late release occurs when
-the release neurons are not sufficiently
-active in order to effect the lever release.
-Alternatively, late release can occur
-if the release signal is not faithfully
-transmitted from the release neurons
-(modeling activity in motor cortex)
-to the intermediate populations
-(modeling activity between motor cortex and muscles)
-before interfacing with the simulated environment.
-A late release in the adaptive model
-looks identical, with little activity
-in the double integrator model that predicts cues.
-
+\clearpage
 \section{Figures}
 
-\scalefigone{fig1}{0.5}{}
+\scalefigone{fig1}{1.0}{}
 
 \scalefigone{fig2}{1.0}{}
 
@@ -1193,10 +1707,14 @@ in the double integrator model that predicts cues.
 
 \scalefigone{fig5}{1.0}{}
 
-\scalefigone{fig6}{1.0}{}
+\scalefigone{fig6}{0.5}{}
 
 \scalefigone{fig7}{1.0}{}
 
 \scalefigone{fig8}{1.0}{}
+
+\scalefigone{fig9}{0.5}{}
+
+\scalefigone{fig10}{1.0}{}
 
 \end{document}

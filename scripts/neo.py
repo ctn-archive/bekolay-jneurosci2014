@@ -1,20 +1,19 @@
 """
-My tweaks to python-neo to make things easier.
+My tweaks to python-neo
 """
 from __future__ import absolute_import
 
-import quantities as pq
 import numpy as np
+import quantities as pq
 import scipy.signal
 
-from neo import Segment, AnalogSignal, SpikeTrain
-from neo import EventArray, EpochArray, Event
+from neo import Segment, AnalogSignal, SpikeTrain, EventArray, EpochArray, Event
 from neo.io.baseio import BaseIO
 from neo.io.neuroexplorerio import NeuroExplorerIO
 from neo.io.hdf5io import NeoHdf5IO
 
 
-### EpochArray additions
+### EpochArray
 
 def epa__eq__(self, other):
     return (np.all(self.times == other.times) and
@@ -68,7 +67,7 @@ def epa_merge_and_sort_epochs(epochs1, epochs2):
     return (map(lambda m: m[0], merged) * epochs1.times.units,
             map(lambda m: m[1], merged) * epochs1.durations.units,
             np.array(map(lambda m: m[2], merged), dtype='S'))
-EpochArray._merge_and_sort_epohcs = staticmethod(epa_merge_and_sort_epochs)
+EpochArray._merge_and_sort_epochs = staticmethod(epa_merge_and_sort_epochs)
 
 def epa_filter_for(self, seq, copy=True):
     """Filter the EpochArray so that only the seq `seq` remains."""
@@ -116,8 +115,8 @@ def epa_epochs_from(self, seq, name=None):
                                       dtype='S'))
 EpochArray.epochs_from = epa_epochs_from
 
+### EventArray
 
-### EventArray additions
 def eva__eq__(self, other):
     return (np.all(self.times == other.times) and
             np.all(self.labels == other.labels))
@@ -220,13 +219,6 @@ def eva_epochs_from(self, seq, name=None):
                                       dtype='S'))
 EventArray.epochs_from = eva_epochs_from
 
-def eva_during_epochs(self, epoch_array):
-    merged = EventArray()
-    for t, d in zip(epoch_array.times, epoch_array.durations):
-        merged += self.time_slice(t, t + d)
-    return merged
-EventArray.during_epochs = eva_during_epochs
-
 def eva_time_slice(self, t_start, t_stop):
     if len(self) == 0:
         return EventArray()
@@ -239,6 +231,12 @@ def eva_time_slice(self, t_start, t_stop):
     return EventArray(self.times[i:j], self.labels[i:j])
 EventArray.time_slice = eva_time_slice
 
+def eva_during_epochs(self, epoch_array):
+    merged = EventArray()
+    for t, d in zip(epoch_array.times, epoch_array.durations):
+        merged += self.time_slice(t, t + d)
+    return merged
+EventArray.during_epochs = eva_during_epochs
 
 ### SpikeTrain additions
 

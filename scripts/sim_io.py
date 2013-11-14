@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import os
+import os.path
 import numpy as np
 import quantities as pq
 
@@ -125,7 +126,7 @@ class NengoIO(neo.BaseIO):
                             data[j] = [[] for _ in xrange(dims)]
                         elif t == "EventArray":
                             data[j] = [[] for _ in xrange(3)]
-                    # No continue, keep going
+                        # No continue, keep going
 
                 time = float(ll[0])
                 for j, lll in enumerate(ll):
@@ -136,11 +137,11 @@ class NengoIO(neo.BaseIO):
                             data[j][k].append(float(v))
                     elif types[j] == "EventArray":
                         curdata = float(lll)
-                        if curdata == 1.0 and curdata != lastdata[j]:
+                        if np.allclose(curdata, 1.0) and curdata != lastdata[j]:
                             data[j][0].append(time)
-                        elif curdata == 0.0 and curdata != lastdata[j]:
+                        elif np.allclose(curdata, 0.0) and curdata != lastdata[j]:
                             data[j][1].append(time)
-                        elif curdata == -1.0 and curdata != lastdata[j]:
+                        elif np.allclose(curdata, -1.0) and curdata != lastdata[j]:
                             data[j][2].append(time)
                         lastdata[j] = curdata
                     elif types[j] == "SpikeTrains":
@@ -167,17 +168,20 @@ class NengoIO(neo.BaseIO):
                                          name=col + '_' + str(i)))
             elif typ == "EventArray":
                 name = col[:-5] + 'on'
-                labels = np.array([name] * len(dat[0]), dtype='S')
                 seg.eventarrays.append(neo.EventArray(
-                    times=dat[0], labels=labels, channel_name=name))
+                    times=np.asarray(dat[0], dtype=np.float64) * pq.s,
+                    labels=np.array([name] * len(dat[0]), dtype='S'),
+                    channel_name=name))
                 name = col[:-5] + 'zero'
-                labels = np.array([name] * len(dat[0]), dtype='S')
                 seg.eventarrays.append(neo.EventArray(
-                    times=dat[1], labels=labels, channel_name=name))
+                    times=np.asarray(dat[1], dtype=np.float64) * pq.s,
+                    labels=np.array([name] * len(dat[0]), dtype='S'),
+                    channel_name=name))
                 name = col[:-5] + 'off'
-                labels = np.array([name] * len(dat[0]), dtype='S')
                 seg.eventarrays.append(neo.EventArray(
-                    times=dat[2], labels=labels, channel_name=name))
+                    times=np.asarray(dat[2], dtype=np.float64) * pq.s,
+                    labels=np.array([name] * len(dat[0]), dtype='S'),
+                    channel_name=name))
 
         return seg
 
@@ -186,16 +190,12 @@ def convert_to_h5(filename):
     if not filename.endswith("csv"):
         print "File not a CSV. Returning."
         return
-
-    print "Reading " + filename + " ...",
     r = NengoIO(filename)
     seg = r.read_segment()
     w = neo.NeoHdf5IO(filename[:-3] + "h5")
     w.save(seg)
     w.close()
     os.remove(filename)
-    print "done converting."
-    return seg, nengoevents
 
 
 def get_seg(filename):

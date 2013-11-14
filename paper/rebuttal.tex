@@ -1,0 +1,1127 @@
+\documentclass[11pt,paper=letter]{scrartcl}
+\usepackage[english]{babel}
+\usepackage{amssymb,amsmath}
+\usepackage{namedplus}
+\usepackage[font=sffamily]{quoting}
+\usepackage{helvet}
+\usepackage[backgroundcolor=yellow,linecolor=yellow]{todonotes}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks = true, %Colours links instead of ugly boxes
+  urlcolor = blue, %Colour for external hyperlinks
+  linkcolor = blue, %Colour of internal links
+  citecolor = blue %Colour of citations
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{12pt}
+
+\begin{document}
+
+\vspace*{1.5\baselineskip}
+\begin{flushright}
+  \today
+\end{flushright}
+
+Dear Editor,
+
+Please find a revised version of
+``A spiking neural integrator model of the adaptive
+control of action by the medial prefrontal cortex''
+attached for your consideration for publication in the
+Journal of Neuroscience.
+
+We very much appreciate the reviews
+of the original submission.
+Considerable effort has been made to address
+all issues raised in the reviews.
+In order to address these issues,
+we have done additional simulations
+and revised a significant portion of the text.
+Three new figures and several pages
+of text have been added
+to clarify issues that were unclear
+in the original submission,
+and to present the results
+of the additional simulations.
+
+One notable change in the manuscript,
+reflected in the updated title,
+is our use of the term ``medial prefrontal cortex,''
+or mPFC, instead of ``anterior cingulate cortex,''
+or ACC, to characterize the brain area
+that was the focus of our study.
+This change was made in response to
+Reviewer 1, who raised concerns
+about functional homologies across species.
+Anatomists working on the ACC
+consider the prelimbic cortex
+(area 32) as a cingulate region
+(e.g., studies from the Barbas lab;
+\citenoparens{Medalla2009}).
+However, there is an unfortunate controversy
+about the rat prefrontal cortex,
+due in part to the Uylings review
+that the reviewer mentioned.
+We would like to avoid debate
+about this issue in our paper,
+and chose to use a more generic term
+that is commonly used in rodent studies
+to describe the cortical region
+in the revised manuscript.
+
+We hope that you find the manuscript
+is now suitable for publication
+and look forward to hearing from you soon.
+
+Sincerely, \vspace{1em}
+
+Trevor Bekolay, Mark Laubach, Chris Eliasmith
+
+\clearpage
+\setlength{\parindent}{1cm}
+\setlength{\parskip}{3pt}
+
+\section*{Reviewer 1}
+
+We would like to thank the reviewer for his or her
+careful reading of our manuscript
+and thoughtful feedback on conceptual
+and technical issues in the study.
+We have addressed all points raised
+in the review,
+and we believe that the paper
+is very much improved thanks
+to Reviewer 1's comments.
+
+\begin{quoting}
+  The computational model, named ``double integrator model'' is a
+  dynamical system composed of two interacting populations of spiking
+  neurons. It is programmed in the Nengo simulation environment, as
+  part of the Neural Engineering Framework (NEF; Eliasmith and
+  Anderson, 2003) which has the potential to constitute a useful tool
+  for neuroscientists to try to simulate, reproduce and better
+  understand activities of large cortical networks.
+
+  The description of the model should be strongly clarified and
+  extended to enable the reader to precisely understand what is being
+  simulated and to distinguish what is part of the general Nengo
+  framework and what is specific to the proposed computational model.
+\end{quoting}
+
+We appreciate the comments on Nengo and the NEF.
+The ``double integrator model'' is originally
+from \citetext{Singh2006}.
+We have adapted it for the present study
+by giving it more inputs, with the most
+important being the event that terminates
+integration (reward feedback).
+Additionally, we have made
+a feedforward control network,
+and used the double integrator
+to control its behavior adaptively.
+These distinctions have been made more clear
+due to reorganization of the methods section,
+and by simplifying several sections of the model.
+For example, the \textit{Holding} and \textit{Trigger}
+populations only existed in the neural implementation.
+We have removed those and ensured that
+all neural models are a direct implementation
+of their corresponding dynamical systems.
+All of the equations governing
+the dynamical systems are included
+in the revised manuscript.
+
+\begin{quoting}
+  More analyses of the results should be provided (dependence to
+  parameters, robustness) to better highlight under which conditions
+  the model can or cannot reproduce the results - instead of simply
+  showing a version of the model that works well.
+\end{quoting}
+
+We have now included several numerical simulations
+of the dynamical system (Figures 4 and 5)
+to clarify the goals of the model,
+and under which conditions it meets these goals.
+These simulations show how the system changes
+as a result of changes to the three free parameters
+in the double integrator network equations.
+The many parameters affecting the neural implementation
+are selected partly at random;
+the model performs well and
+matches the experimental data
+for many different sets of randomized parameters.
+We have explicitly listed the distributions
+from which we choose neural parameters
+in order to make the model easier to reproduce.
+
+\begin{quoting}
+  The relation to previous computational models and experimental data
+  of the primate ACC and rodent mPFC should be better framed and
+  discussed, since it is not clear how the present simulations of one
+  particular rat mPFC electrophysiological study can
+  relate/complete/replace previous theories of the role of primate ACC
+  in cognitive control, as the authors claim in the introduction; the
+  discussion should be extended to thoroughly address each raised
+  issue.
+\end{quoting}
+
+Thanks for this comment.
+We must admit that some of the text
+in the original manuscript was too bold
+with regard to the impact of our model
+of delayed response performance
+by the rat mPFC.
+The text was revised with this in mind,
+and we hope that the changes
+address Reviewer 1's concerns.
+
+There are many models of ACC/mPFC function
+available in the literature.
+Given the scope of our study, it was not possible
+to address all potential models.
+We chose to focus on the recent PRO model
+by \citetext{Alexander2011} and included
+comparisons of our results
+to that model in Section 5.1 and Figure 6.
+We have also included Section 5.2 in the discussion
+to relate our results to those from
+reinforcement learning based approaches like
+\citetext{Behrens2007,Alexander2011,Khamassi2012}.
+
+\begin{quoting}
+  In the introduction, the objective of the study and its potential
+  contribution to important neuroscience debates should be better
+  formulated. First, the authors claim that "there are currently no
+  mathematical accounts of ACC function that would explain the myriad
+  of behaviors modulated by the ACC." But the model presented here
+  does not attempt to explain a myriad of behaviors. It only
+  reproduces data from a single study (Narayanan and Laubach, 2009).
+\end{quoting}
+
+The reviewer is correct, and we should not
+have written this text so strongly.
+The introduction has been thoroughly
+revised in the new manuscript.
+
+\begin{quoting}
+  Although I agree that there currently is not any complete model of
+  ACC functions, there are several recent computational models that
+  have importantly extended the initial models and that the authors do
+  not seem aware of (Behrens et al., 2007; Alexander and Brown, 2011;
+  Khamassi et al., 2013). I think the manuscript would greatly benefit
+  from clearly stating what is new compared to these previous models.
+\end{quoting}
+
+As mentioned above, a detailed comparison
+to \citetext{Alexander2011} is included
+and the other two papers are now cited and discussed.
+
+\begin{quoting}
+  Can these models already explain part of the results of (Nayanan and
+  Laubach, 2009)? Even if yes, I think that the dynamical aspect of
+  the present model provides something more that should be better
+  highlighted. For instance, I think that both the models of Alexander
+  and Brown 2011 and Khamassi et al. 2013 could account for the ACC
+  activity reported in Narayanan and Laubach 2009 that "change
+  significantly after errors, and appear to contain information that
+  an error occurred". This should be discussed.
+\end{quoting}
+
+Reviewer 1 is correct that the models presented in
+\citetext{Alexander2011} and \citetext{Khamassi2012}
+would be able to account for some elements
+of the \citetext{Narayanan2009} data.
+However, we believe that our ability
+to generate spike data that can be
+directly compared to the experimental data
+is a unique contribution,
+in additional to the dynamical aspect
+that the reviewer notes.
+While the information
+being tracked is similar between
+all of these models
+(as shown in the revised manuscript's Figure 6),
+we interpret that information
+from a dynamical systems perspective
+which provides an alternative hypothesis
+of how that information might come about
+(as Reviewer 1 states).
+We have highlighted the dynamical aspect of the model
+(particularly in Section 5.2, but also throughout),
+and thank Reviewer 1 for pointing out
+the similarities between these models.
+
+\begin{quoting}
+  It is not true that since ``no existing models have been implemented
+  with spiking neurons [...] no models can be analyzed with the same
+  methods used to analyze single neuron recordings.'' Simulations of
+  simple non-spiking neural network models or even of algorithmic
+  models can be analyzed with methods that consider neurons' firing
+  rate in different time bins.
+\end{quoting}
+
+We respectfully disagree on this point.
+While it is true that
+our analyses could be performed with
+firing rates in time bins,
+there are more detailed analyses that can only
+be performed with raw spike data.
+For neural network models with
+real-valued output from each neuron,
+a representation scheme must be used
+to represent that real-valued output
+with spiking neurons;
+firing rate alone is rarely sufficient.
+For rate models that emit firing rates
+and use a representation scheme,
+the temporal dynamics in a spiking model
+are significantly different;
+a neural integrator, for example,
+requires about twice as many
+spiking neurons than rate neurons
+to obtain similar performance.
+
+In short, there are a variety
+of differences between rate and spiking models
+that require additional analyses
+or ``translations'' of rate models
+for comparison with spike data,
+which are not required of spiking models.
+
+\begin{quoting}
+  I think the important thing here is that some characteristics of
+  recorded neural activities can be seen as emerging properties of a
+  dynamical system which a spiking neural network model enables to
+  reproduce.
+\end{quoting}
+
+We agree with this statement,
+and have attempted to highlight this
+in the revised discussion.
+As a general statement on neural modeling,
+we believe that the aim should not be
+to reproduce neural activities,
+but instead to produce a working mathematical model.
+By implementing the model in a spiking neural system,
+we ensure that the model is robust
+to the temporal dynamics of spiking neural networks,
+and are able to compare directly
+to recorded neural activities.
+In this sense, the neural activities can be thought of
+as ``emerging'' from the neural realization
+of the mathematical model.
+
+\begin{quoting}
+  I think there is a major issue that needs to be solved concerning
+  the acceptability or non-acceptability of considering that the mPFC
+  (more precisely the prelimbic cortex (PL)) in rodents is the same
+  thing as the ACC in primates. The state of the art of related
+  previous computational models provided in the introduction only
+  discusses models of ACC function in primates. It does not discuss
+  any computational model of PL in rodents (e.g. see Koene and
+  Hasselmo, 2005; Martinet et al., 2011). Classically, the rodent PL
+  is considered as subserving homologous functions to the dorsolateral
+  prefrontal cortex (DLPFC) in primates (Uylings et al., 2003). But
+  people agree that the PL in rodents is less differentiated than the
+  DLPFC in primates, and PL may integrate functions homologous to both
+  the primate DLPFC and ACC. However, it should be taken into
+  consideration that the more dorsal part of mPFC in rodents (named
+  ACd/Fr2 in the Paxinos) could also partly integrate some functions
+  homologous to the ACC in primates. Globally the authors should give
+  more justifications. Cite for instance Seamans et al. (2008).
+  Nevertheless, it is not straightforward to draw conclusions about
+  ACC functions in primates from a model that has been calibrated to
+  reproduce electrophysiological activities from a single study in the
+  rodent PL (i.e. Narayanan and Laubach, 2009). Maybe the paper would
+  benefit from a rewriting of the Introduction mainly describing
+  previous experimental results and computational models of PL in
+  rodents (although still briefly mentioning the implications for the
+  understanding of the role of ACC in primates), and discussing in
+  details the possible homologies with the ACC in primates in the
+  Discussion.
+\end{quoting}
+
+The terms used for describing the medial frontal cortex
+across species continues to be an issue for us (ML)
+and many other researchers.
+The original manuscript used
+the term ``anterior cingulate cortex,'' or ACC.
+Our rationale for this was that anatomists
+working on the primate ACC
+have commonly included the prelimbic cortex
+(area 32) in the ``ACC''
+(for example, studies from the Barbas lab;
+\citenoparens{Medalla2009}).
+However, there is an unfortunate controversy
+about the rat prefrontal cortex,
+due in part to the Uylings review
+that the reviewer mentioned.
+One of us (ML) has spent much time
+discussing this issue
+in conferences and workshops
+(see \citenoparens{Laubach2011}).
+We would like to avoid debate about this issue
+in our paper, as it has little to do
+with the validity of a double integrator network
+as a candidate model
+for explaining computations
+performed by the rodent PFC
+in controlling timed actions.
+We chose to use a more generic term
+(medial prefrontal cortex, or mPFC),
+which is commonly used in rodent studies,
+to describe the cortical region in the revised manuscript.
+We have also limited the scope of our claims.
+
+Following the reviewer's suggestion,
+we added text to the Introduction
+to review the series of studies
+done by the Laubach lab
+that led to collaboration
+with the Eliasmith lab
+on the double integrator network.
+
+\begin{quoting}
+  The presentation of previous results obtained by Narayanan and
+  Laubach 2009 is too short and is not described with enough details
+  to enable the reader to fully understand without reading the
+  original paper. The authors should dedicate more space to describe
+  the results displayed in Figure 2 and to clearly explain the
+  interpretation they make. In particular, what does figure 2F tell
+  us? Also, we would like to see on figure 2 the onset of the correct
+  and error related PCS at the time of the feedback.
+\end{quoting}
+
+Thanks for raising this issue.
+We agree that more should have been done to make Figure 2 clear,
+and panel F was not sufficiently explained
+in the original paper.
+A paragraph was added to Section 2.5.1
+to discuss the plots in panel F,
+and the timing of reward feedback
+has been noted in the figure.
+Importantly, we note that
+the analysis was only done on correct trials,
+and so feedback was at the same time
+for bot the post-correct and post-error trials.
+
+\begin{quoting}
+  The model should be described in more details both for specialists
+  who would like to reimplement it themselves and for experimentalists
+  who will read the paper. First, the terms used in equation (6)
+  should be better explained. Second, it is not always clear which
+  computations are specific to the proposed computational model and
+  which computations are general to the NEF framework to implement any
+  dynamical system and ``any neuron model''. To make the message
+  clearer, I think it is important here to stick to the description of
+  the proposed computational model, and to mention in a clearly
+  separated paragraph what describes properties of the NEF (and of
+  Nengo) that could be interesting to a reader that would like to
+  program his own model.
+\end{quoting}
+
+Some confusing and unnecessary aspects of the model
+have been simplified.
+For example, the \textit{Holding} and \textit{Trigger} populations
+were removed.
+They originally existed in order to extend
+the model to more general situations
+in which motor actions may be
+contingent on body state
+through visual or proprioceptive feedback;
+however, we have instead constrained the model
+and linked the results only to the simple RT task
+in order to simplify explanation
+and avoid overgeneralizing the model
+to tasks we have not modeled.
+
+We have made several improvements to
+the methods sections on
+the dynamical systems and the NEF.
+Included in those improvements
+is a rewritten Equation (6)
+that now uses matrix notation
+to make the mathematical operation
+(least-squares minimization) more clear.
+While it was also the case
+in the original paper
+that NEF-specific equations
+were only listed in one section,
+we hope that with these improvements
+it is more clear that all of the equations
+in Section 2.4 are specific to the NEF,
+and all equations in other sections
+are part of the dynamical systems
+that are simulated both directly
+and implemented in spiking networks with the NEF.
+
+Due to the lack of supplementary material,
+it is difficult to include
+a sufficiently detailed explanation of the NEF
+to make it easily reproducible
+from this paper alone.
+We have opted for a comprehensive
+explanation that includes
+all of the equations necessary
+to reproduce the results,
+but with shorter explanations
+than can be found
+in other resources on the NEF.
+However, we believe that the open source nature
+of Nengo and the scripts that we use
+to generate the model
+make it possible for specialists
+to reproduce the model.
+
+\begin{quoting}
+  The authors should avoid using the term "model" for many different
+  things, since this can be very confusing for experimentalist readers
+  (i.e. the computational model; "any neuron model"; "for each
+  instance of each model"; ...).
+\end{quoting}
+
+The many levels of modeling that are used in this study
+makes an overuse of the word ``model''
+difficult to avoid;
+we thank the reviewer for pointing this out.
+We have attempted to minimize
+the use of the word model.
+Specifically, we refer to the dynamical systems
+(the double integrator, cue-responding,
+and adaptive control systems) and their neural
+implementations as ``networks.''
+All uses of the term ``model'' are prefaced
+with a identifying term such as
+``neuron'' or ``network'' in order
+to avoid ``model'' losing its meaning
+as a mathematical idealization.
+
+\begin{quoting}
+  The authors mention a mechanism for switching between an aggressive
+  timing strategy and a conservative cue-response strategy. What is
+  the programmed criterion for switching? Please write the used
+  equations.
+\end{quoting}
+
+Thanks to Reviewer 1 for pointing out this glaring omission.
+We have included the switching criterion as Equation (5)
+in the revised manuscript.
+
+\begin{quoting}
+  It is important to provide analyses of the strengths and weaknesses
+  of the proposed computational model, so that the reader can really
+  understand what enables and what does not enable the model to
+  succeed in reproducing the experimental data. What is the
+  sensibility to changes in parameter values? Could the authors
+  illustrate the quality of reproduction of experimental data as a
+  function of different parameter sets?
+\end{quoting}
+
+We have attempted to explain the meaning of the parameters
+through the newly added text in Section 3.1,
+and its associated analyses in Figure 4.
+We have also given more context to these parameters
+in the explanations of the dynamical systems
+in Sections 2.2 and 2.3.
+
+Aside from the three parameters we set,
+the model's success is dependent solely
+on the ability of the integrative populations
+to retain their represented values over time.
+In our case, model fits are generally good
+(Pearson $R^2 > 0.7$)
+in any case when the random neural parameters
+produce good integrators.
+The ALIF neuron introduces additional dynamics
+that make creating neural integrators
+more difficult than
+neural integrators made up of LIF neurons,
+but these difficulties can be overcome
+with larger populations.
+The original double integrator paper
+\cite{Singh2006}
+discusses the robustness
+of NEF-created neural integrators
+in the double integrator context,
+and \citetext{Eliasmith2005} discusses this issue
+for many NEF-constructed attractor networks.
+More detailed analyses can be found
+in \citetext{Eliasmith2003}.
+
+\begin{quoting}
+  Related to this issue, on page 11, an important question is how much
+  of parameter tuning was necessary to obtain the same PCs as
+  experimental data? It is good to reproduce the experimental results.
+  But it is even better to show analyses of different regimes or
+  states the model can produce with different parameters, and to
+  highlight which of these states or regimes may the experimental data
+  correspond to.
+\end{quoting}
+
+We now discuss in the paper
+how each parameters affects the model,
+and show simulations with different sets of parameters
+(Table 1 describes the ALIF parameters;
+Table 2 and Figure 4 describe the
+dynamical system parameters).
+Section 3.1 discusses the results
+of the simulations
+and lists the parameters values
+that were chosen.
+Importantly, the parameter choices
+did not require fitting,
+and for most parameters,
+a range of values would produce
+functionally identical results.
+
+For the experimental model fits in Figure 7,
+several models were generated and the best
+experimental fit was chosen.
+It is possible to show the
+average fits for
+several instantiations of the model,
+but this is not very informative because
+increasing the number of neurons in the model
+produces networks that fit the data well
+nearly all the time,
+despite many randomly generated parameters.
+As noted above, the performance of the integrators
+is the critical factor to the performance
+of the entire model.
+
+\begin{quoting}
+  In relation to the previous point, it seems quite ad hoc and looks
+  like a strong simplification to hand tune the model so that "reward
+  delivery [...] resets the system to a starting state" while "an
+  error trial [drives it] to a low state". Shouldn't different
+  reactions of the model to correct versus incorrect trials emerge
+  through learning (such as in reinforcement learning-based models of
+  ACC; e.g. Alexander and Brown, 2011; Khamassi et al., 2013)? Or
+  shouldn't they at least produce symmetrical effects on the model
+  that it should exploit to produce different reactions? Isn't this a
+  strong help provided a priori to the model to make it react in the
+  expected way? Maybe I am wrong to think that this is a
+  simplification. Maybe this is equivalent to the priors put in the
+  cited previous computational models. But this should be at least
+  discussed by the authors. For instance, doesn't such simplification
+  prevent generalizations of the model to tasks involving a sequence
+  of rewards and/or punishments (e.g. Tanaka et al., 2004)?
+\end{quoting}
+
+This is an important point that identifies
+the central difference between
+models created with the NEF
+and many other computational modeling approaches,
+including reinforcement learning-based approaches.
+What Reviewer 1 calls hand tuning and simplification
+is essentially our dynamical systems hypothesis
+of how to solve the reaction time task
+with a control system operating in continuous time.
+While it may seem a simplification
+for reward to drive the system to the origin
+and error to drive it to a low part of the state space,
+these reflect the operations
+that are possible (and, indeed, natural) in dynamical systems.
+We use these operations to implement a dynamical system
+that performs the task
+as we hypothesize the rodent performs the task.
+We can then implement that dynamical system
+in a network of spiking neural populations
+through the principles of the NEF.
+This spiking neural network models
+the neural circuit of a rodent
+that has already learned the task;
+going from random connectivity to this network
+is a separate branch of research.
+We believe that providing the end-point of learning
+is a great help to modelers
+aiming to learn this kind of neural circuit
+(and have shown an example of this
+in other work; e.g., \citenoparens{MacNeil2011}).
+
+In other words, the NEF provides three biologically plausible
+principles for network construction
+through which we can produce a neural circuit.
+We have presented a way in which those principles
+can be used to generate a network
+that performs the simple RT task.
+We have attempted to
+emphasize these consideration
+in various parts of the revised discussion,
+most notably Sections 5.1 and 5.2.
+
+\begin{quoting}
+  Some simulation results are too briefly presented -- sometimes
+  making it difficult to understand for the reader -- and some are not
+  analyzed with enough deepness. On page 10, the results displayed in
+  figure 4 should be better explained in the main text. A few lines
+  below, in contrast to what the authors wrote, it is not clear for
+  the reader from these trajectories that the time of the cue can be
+  predicted. During correct trials, the cue has already occurred to
+  make ACC in the right starting position for the next trial. Please
+  explain what you mean here.
+\end{quoting}
+
+Simulations of the dynamical system are expanded
+and simplified, as discussed below.
+We have included two new figures (4 and 5)
+that aim to help with understanding
+how the simulations work under different sets of parameters.
+More detailed equations throughout Sections 2.2 and 2.3
+are also included in the revised manuscript.
+
+\begin{quoting}
+  The authors should show, either on figs 4 and 5 or on supplementary
+  figures, correct, premature and late trajectories starting from the
+  lower-left starting position (following an error).
+\end{quoting}
+
+Figure 4 in the revised manuscript now presents trajectories
+from many different initial conditions.
+It also shows how the result of the last trial
+determines the initial conditions
+of the next trial.
+
+\begin{quoting}
+  Can the states be decoded in the same manner when starting from such
+  a different position?
+\end{quoting}
+
+The state can be decoded,
+but the cue cannot be accurately predicted
+unless the system starts at the origin
+under normal system behavior.
+This is why cue prediction does not occur
+in post-error trials;
+the system starts in the lower part
+of the state space instead of the origin.
+This is shown and expanded on in Figure 4
+and Section 3.1.
+
+\begin{quoting}
+  On page 11, the authors show that the double integrator model has
+  the same PCs as the experimental data. Could the authors also show
+  whether the cue-responsive model also produces similar PCs as
+  experimental data?
+\end{quoting}
+
+The cue-responsive network does not contain any integrative
+populations, so it is highly unlikely that
+the PCs would be the same as the experimental data.
+However, there is an open question
+(which was raised by Reviewer 2)
+as to whether other network structures
+would result in the same principal
+components as the double integrator network.
+In order to address this question,
+we have added Figure 8 in the revised manuscript,
+which shows that
+a single integrator does not produce
+similar PCs as experimental data.
+
+\begin{quoting}
+  In Narayanan and Laubach (2009), premature and late cases are
+  combined in a single PC1 and PC2 couple of curves for "post-error".
+  Do the PCs of the original data (from Narayanan and Laubach 2009)
+  still look like the model's curves when premature and late cases are
+  separated?
+\end{quoting}
+
+In \citetext{Narayanan2009}, the PC analysis
+was only done using correct trials.
+Error trials were not included in the analysis.
+PCA done on premature trials
+deviate from those based on correct trials
+due to the rats responding early in the foreperiod.
+PCA on late trials do not differ much
+from those on correct trials,
+but lack modulation during the normal period
+when rats release the lever
+at the end of the foreperiod.
+
+\citetext{Narayanan2008},
+which was mistakenly not cited in the previous
+version of the paper, reported effects
+for premature and late responses,
+and showed that single units
+(not population activity)
+tracked outcomes during
+the intertrial interval.
+
+Importantly, while neural activity
+tracked outcomes during the intertrial interval,
+that activity did not differentiate
+between the type of error that occurred
+\cite{Narayanan2008}.
+Therefore, we combine post-premature
+and post-late trials when analyzing
+the experimental data
+in order to increase
+the number of trials being analyzed,
+and therefore increasing
+the statistical power of the analysis
+For the simulated data,
+we analyze the two separately
+in order to show that the model also
+does not differentiate between
+the two cases;
+since we can simulate as many
+trials as we want,
+we do not need to combine
+the types of error trials
+in order to increase statistical power.
+
+\begin{quoting}
+  Could the authors explain how late trials can occur in the adaptive
+  control model nearly as often as the other model while the former
+  anticipates and responds faster than the latter?
+\end{quoting}
+
+Late trials can occur in exactly the same way
+as in the cue-responding model post-error,
+as the adaptive control model takes
+a cue-responding strategy in that case.
+Like in the cue-responding case,
+late trials often correspond to non-responses,
+in which the release should have occurred,
+but release sensitive neurons were
+not active for long enough to actually
+effect the full lever press.
+These errors occur at approximately
+the same frequency in the cue-responding
+and adaptive control models.
+
+\begin{quoting}
+  Can the model also reproduce activities during the second version of
+  the task in Narayanan and Laubach 2009 where cues are presented only
+  on half of the trials?
+\end{quoting}
+
+Because the cue is predicted by the double integrator network,
+the model can accomplish the task even if the cue
+is not actually present.
+The model would not change
+or produce different PCs in this case,
+so we did not discuss the second version of the task
+in order to keep the focus of the paper clear.
+
+\begin{quoting}
+  Do the simulation results really demonstrate that the ACC cannot
+  inhibit the motor command? (Page 9). If ACC is x1+x2, then what
+  brain structure correspond to H+T+P/R units? If it is also ACC, the
+  authors need to first validate their ability to reproduce recorded
+  ACC activity. If not, then how does the model prove that ACC is not
+  inhibiting motor responses? A convincing demonstration would have
+  been to simulate the two alternative hypotheses and show that one
+  fails to reproduce some experimental evidence. Otherwise, the
+  authors should not sell this part of the work (page 9) as a strong
+  demonstration, but rather just say that with this ACC model, it is
+  not necessary to exert inhibition on motor cells to work.
+\end{quoting}
+
+We have removed sections
+discussing the motor inhibition hypothesis
+from the paper.
+We thank Reviewer 1 for pointing out
+the weaknesses of this argument;
+we believe that the revised discussion
+proposes more concrete predictions
+that come from the model.
+
+\begin{quoting}
+  The prediction extracted from the model on page 12 ("our model
+  predicts that fewer premature releases would occur") appears like a
+  trivial prediction. It seems to the reader that there is no need of
+  a computational model to predict this. Either expand on this
+  prediction or give arguments to convince the reader that this is not
+  a trivial prediction.
+\end{quoting}
+
+We agree that this prediction is trivial,
+and have removed it from the revised manuscript.
+
+\begin{quoting}
+  The model should not only be evaluated in its ability to reproduce
+  neurophysiological recordings, but also in its ability to reproduce
+  rat behavior simultaneously recorded. For instance, on page 10, it
+  is stated that "if the previous trial was an error, the double
+  integrator will not be following the trajectory that predicts the
+  time of the cue, and therefore will not cause a lever release." Is
+  it what rats do in Narayanan and Laubach (2009)? Please quantify
+  such behavior and other behaviors of the model and compare with rat
+  behavioral data.
+\end{quoting}
+
+Unfortunately, it is impossible to determine if rodents
+are predicting the time of the cue given their behavior alone;
+we could estimate this by analyzing
+the reaction times on correct trials
+following an error,
+but due to amount of variability in reaction times,
+there are not enough instances of post-error correct trials
+to definitively state that reaction times are slower
+on these trials compared to post-correct correct trials.
+
+We provide a summary comparing
+the behavioral statistics of
+the spiking cue-responding and adaptive control networks
+to the experimental subjects in Figure 10.
+We believe this is the most appropriate evaluation
+given the data available.
+
+\begin{quoting}
+  The manuscript would be strengthened if the authors could provide a
+  series of testable experimental predictions that would allow to
+  further test/refute the proposed computational model. In particular,
+  what further experiments are needed to decide between the two
+  mentioned alternative hypotheses about ACC inhibiting motor
+  responses or this inhibition being elsewhere?
+\end{quoting}
+
+We have added Section 5.3 listing several predictions.
+Since we do not discuss the motor inhibition hypothesis,
+we do not propose an experiment relating to this hypothesis.
+However, we do make predictions about
+how neurons might respond in tasks
+with different temporal dynamics,
+and discuss experiments that can be done
+to confirm or refute our predictions.
+
+\begin{quoting}
+  The discussion about the necessity to differentiate between
+  adaptability due to recurrent activity and adaptability due to
+  synaptic weight changes is very interesting and should be further
+  elaborated and extended. In particular, previous ACC models rely on
+  reinforcement learning mechanisms that would induce adaptability due
+  to synaptic weight changes (Alexander and Brown, 2011; Khamassi et
+  al., 2013). Here the model produces adaptability due to recurrent
+  activity. It would be useful to discuss whether some of the results
+  produced by these previous models may be also explained by recurrent
+  activity. If yes, could the authors think of an experimental
+  protocol that would enable to decide which of the alternative models
+  is right?
+\end{quoting}
+
+We agree that differentiating
+between adaptability
+through recurrent activity
+and through synaptic weight changes
+is an important issue
+that we think will become increasingly important
+as more complex mPFC models are proposed.
+We have added Section 5.2 to discuss
+this differentiation.
+
+In the revised discussion, we have proposed two
+new experiments that could allow for
+direct comparisons between neural data
+and the simulated networks.
+First, one could record as rats are initially trained
+to perform the task and compare
+the dynamics of the mPFC (and motor cortex)
+with a double integrator network.
+A challenge for the theory side would be
+to evaluate various types of RL algorithms
+that might enable a match
+between theory and data.
+Second, one could train rats to perform
+a variant of the simple RT task
+using multiple foreperiods,
+and test the rats in sessions with
+interleaved and blocked foreperiods.
+If the mPFC neurons
+and double integrator neurons track
+the expected timing of action,
+as we predict, then there would be
+shifts in the temporal expectations
+following each switch in block
+(e.g., from 0.5 to 1.5 second foreperiods
+over blocks of 30 trials).
+To our knowledge,
+no group has carried out such studies.
+However, they could allow for
+direct comparisons between
+brain activity and theory.
+
+\begin{quoting}
+  The discussion about possible extension of the model to account for
+  data in the Stroop task should be discussed in relation to previous
+  models. What would such extension of the authors' model add to
+  previous simulations with the model of Dehaene and Changeux (1998)?
+  Globally, the discussion should be extended to thoroughly address
+  each raised issue.
+\end{quoting}
+
+We have removed the possible extension of the model
+to the Stroop task and instead highlighted
+the model's specificity to the simple RT task.
+However, we have also highlighted in Section 5.2
+that the process of creating
+dynamical system for performing the simple RT task
+could also be done for many other tasks
+and implemented using the same methods.
+
+\section*{Reviewer 2}
+
+We would like to thank Reviewer 2
+for noting the interesting point that
+the double integrator model and the published
+mPFC recordings share the same
+population statistics, and for inquiring
+about some details in the neural circuit model.
+We believe that we have been able to
+address all of his or her concerns,
+and, as above for Reviewer 1,
+the manuscript is much improved
+thanks to his or her suggestions.
+In what follows,
+we detail our responses to each comment.
+
+\begin{quoting}
+  I think the most compelling result in the paper is in figure 6 --
+  i.e. that the network has the same principal components as the
+  neural data. One question I have is to what extent this result is
+  unique to a double integrator or could other networks produce these
+  kind of PCs? My feeling is you have to have something like a double
+  integrator but I would like to see some control simulations that
+  show that. So, for example, would a single integrator network have
+  those PCs? Would a random network with the same inputs have those
+  PCs?
+\end{quoting}
+
+This is an interesting point,
+especially when using principal component analysis
+on filtered and Z-scored spike trains.
+To address this issue, we added
+principal component analysis results
+from a single integrator network (Figure 8),
+and show that it does not have
+the same PCs as the double integrator
+or the neural recordings.
+
+\begin{quoting}
+  I'd like to see slightly more in section 2.3.2. In particular what
+  are the exact update equations for the network? In particular what
+  is the exact form of $G$ what are the values of $J_{bias}$ etc ... I
+  realize these details are in the referenced paper and book but I
+  think it is appropriate to have them in an abridged form here.
+\end{quoting}
+
+The update equation for $G$ has been included in Section 2.4
+(which was formerly Section 2.3.2),
+and a table of the parameters used
+(that discusses how $J_{bias}$ is determined)
+has been included as Table 1.
+
+\begin{quoting}
+  I might have missed this - but how many neurons are in the model?
+  You say you sample 174 but I'm not sure how many are in the actual
+  model?
+\end{quoting}
+
+Thanks for catching this issue.
+The simulated networks had 1200 neurons;
+this has been stated in the revised text
+and in Figure 3.
+
+\begin{quoting}
+  Regarding the fact that the behavior of the model is slightly too
+  good (not enough errors) -- you mention adding noise to the model
+  might solve this problem. I think it would be worth reporting
+  whether it does in practice. Neural integrators can be fickle beasts
+  so I don't think this is a given.
+\end{quoting}
+
+Our original mention of noise was in reference
+to the spike density functions plotted
+in (now) Figures 7 and 8.
+While the principal components matched closely,
+the spike densities revealed that
+the simulated data is much cleaner
+than the experimentally recorded data.
+As Reviewer 2 suggests, we added noise
+($J_\eta$, now included in equations
+in Section 2.4)
+and recreated Figure 7 (formerly Figure 6).
+As can be seen in the revised manuscript,
+the simulated spike densities now very closely resemble
+the experimental spike densities,
+while still maintaining a very close
+principal component fit.
+
+In regards to the model performing too well behaviorally,
+this is not an issue of the noisiness of the system,
+but on other modeling decisions.
+In particular, we could have varied $\beta$
+in order to obtain more premature errors,
+which would match the behavior
+of experimental subjects more closely.
+However, rerunning the simulations
+that are summarized in Figure 10
+takes several days.
+Since having a perfect fit
+to the experimental performance
+is not necessary to match other quantities
+like reaction times,
+we chose an acceptable value for $\beta$
+based on direct simulations
+of the dynamical system and
+did not vary it while simulating the spiking implementation.
+
+\begin{quoting}
+  I think it would be nice if you could generate some testable
+  predictions of the model. For example, can you say anything about
+  the character of neurons that contribute to each of the principal
+  components ... is there any difference between them in the model in
+  terms of connectivity (are PC2 neurons more highly connected than
+  PC1 neurons) and sign (are PC1 neurons more likely to be
+  inhibitory). What about microstimulation or inactivation? Similarly
+  for the holding, trigger and press release neurons - how would you
+  know if you were recording them? As I understand it they might not
+  look like figure 8 because that's the decoded signal not firing
+  rate. These are just suggestions and I will leave it to the authors
+  to try and find something - but the nice thing about a model is you
+  can interrogate it and I think it would improve the paper to put
+  down some firm predictions that can be tested.
+\end{quoting}
+
+Thanks for this suggestion,
+which was also raised by Reviewer 1.
+Testable predictions have been added in Section 5.3.
+
+\begin{quoting}
+  Will the Nengo scripts be available through J Neuroscience? I'm not
+  quite sure what the policy is for this kind of material but it would
+  be nice if it were available with the article as the github may
+  change over time ...
+\end{quoting}
+
+A link to the files used
+for the submitted version of the manuscript
+is provided in the revised manuscript.
+This link will always point to the
+version of those files
+used to generate the revised manuscript
+even if changes are subsequently
+made to those files.
+Additionally, we have also included
+at that link a complete copy
+of the Nengo simulator
+used to produce the model,
+in case changes to Nengo also
+affect model behavior.
+With this, any computing environment
+with Java should be able to
+run the simulations,
+and a computing environment
+with Python and several open source libraries
+(listed with the analysis scripts)
+should be able to run
+the analysis and generate
+the plots shown in the paper.
+
+\bibliographystyle{namedplus}
+\bibliography{jneurosci2013}
+
+\end{document}

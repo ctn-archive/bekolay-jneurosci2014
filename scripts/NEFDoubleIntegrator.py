@@ -127,48 +127,48 @@ class DIntReactionTask(BaseReactionTask):
 
 
 class DoubleIntegrator(MPFCModel):
-    def __init__(self, nperd=200,  mode=SimulationMode.DEFAULT, seed=None):
+    def __init__(self, nperd=200, seed=None):
         self.nperd = nperd
-        self.mode = mode
-
         self.radius = 1.1
         self.intscale = 2
 
         super(DoubleIntegrator, self).__init__(seed)
 
     @staticmethod
-    def oscillation(t, amp=1.0, freq=0.185, phase=-2.3):
+    def oscillation(t, amp=1.0, freq=0.185, phase=-2.28):
         return amp * math.sin(2 * math.pi * freq * t + phase)
 
     def oscillator_make(self, net):
         net.make_input('Oscillation', DoubleIntegrator.oscillation)
 
     def dint_make(self, net):
-        net.make('Delay state', self.nperd * 2, 2, radius=self.radius,
-                 node_factory=self.alif_factory)
-        net.make('Delaying', self.nperd * 2 * self.intscale, 2, noise=0.1,
-                 radius=self.radius, node_factory=self.alif_factory)
-        net.make('Timer', self.nperd * 2 * self.intscale, 2, noise=0.1,
-                 node_factory=self.alif_factory, radius=self.radius)
+        common = {'dimensions': 2,
+                  'node_factory': self.alif_factory,
+                  'radius': self.radius}
+
+        n = self.nperd * 2
+
+        net.make('Delay state', n, noise=1.5, **common)
+        net.make('Delaying', n * self.intscale, noise=0.15, **common)
+        net.make('Timer', n * self.intscale, **common)
 
     def _dint_connect(self, net):
         net.connect('RTTask', 'Delaying', origin_name='press',
-                    transform=[0.14, 0], pstc=0.01)
+                    transform=[0.16, 0], pstc=0.01)
         net.connect('RTTask', 'Timer', origin_name='press',
                     transform=[0, -0.01], pstc=0.01)
 
     def dint_connect(self, net):
         net.connect('RTTask', 'Delaying', origin_name='reward',
-                    transform=[-0.005, -0.2], pstc=0.01)
+                    transform=[-0.01, -0.2], pstc=0.1)
         net.connect('RTTask', 'Timer', origin_name='reward',
-                    transform=[0, -0.15], pstc=0.01)
+                    transform=[0, -0.15], pstc=0.1)
         net.connect('RTTask', 'Delaying', origin_name='lights',
                     transform=[0.06, 0], pstc=0.01)
         net.connect('Delaying', 'Timer',
                     transform=[[0.04, 0], [0, 0]], pstc=0.01)
-        if self.mode == SimulationMode.DEFAULT:
-            net.connect('Oscillation', 'Delaying',
-                        transform=[0.02, 0], pstc=0.01)
+        net.connect('Oscillation', 'Delaying',
+                    transform=[0.02, 0], pstc=0.01)
 
         net.connect('Delaying', 'Delaying', transform=[1, 0], pstc=0.05,
                     func=self.dintfunc)
@@ -187,31 +187,25 @@ class DoubleIntegrator(MPFCModel):
     def make(self):
         net = nef.Network('Double integrator', seed=self.seed)
         net.add(DIntReactionTask('RTTask'))
-
         self.oscillator_make(net)
         self.dint_make(net)
         self._dint_connect(net)
         self.dint_connect(net)
-        net.network.setMode(self.mode)
         self.net = net
         return self.net
 
     def log_nodes(self, log):
         log.add("Delay state", tau=0.1)
-        if self.mode == SimulationMode.DEFAULT:
-            log.add_spikes("Delay state")
+        log.add_spikes("Delay state")
+        log.add_spikes("Delaying")
+        log.add_spikes("Timer")
         log.add("RTTask", origin="lever", name="lever_event", tau=0.0)
         log.add("RTTask", origin="reward", name="reward_event", tau=0.0)
         log.add("RTTask", origin="lights", name="lights_event", tau=0.0)
         log.add("RTTask", origin="trigger", name="tone_event", tau=0.0)
 
     def filename(self, experiment):
-        if self.mode == SimulationMode.DEFAULT:
-            mode = 'spikes'
-        elif self.mode == SimulationMode.DIRECT:
-            mode = 'direct'
-
-        return  'dint-%s-%s-%d' % (mode, experiment, self.seed)
+        return 'dint-%s-%d' % (experiment, self.seed)
 
     def run(self):
         if self.net is None:
@@ -232,28 +226,23 @@ class DoubleIntegrator(MPFCModel):
             super(DoubleIntegrator, self).run(fname, exp_length)
 
 if '__nengo_ui__' in globals():
-    dint = DoubleIntegrator(mode=SimulationMode.DEFAULT)
+    dint = DoubleIntegrator(nperd=1000, seed=100)
     dint.make()
     dint.view(True)
 
 if '__nengo_cl__' in globals():
-    params = {
-        'mode': SimulationMode.DEFAULT,
-        'nperd': 200,
-        'seed': None,
-    }
+    params = {'nperd': 200, 'seed': None}
 
-    if len(sys.argv) < 2 or len(sys.argv) > 4:
-        print ("Usage: nengo-cl NEFDoubleIntegrator.py "
-               + "(direct|spikes) [nperd seed]")
+    print sys.argv
+
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print "Usage: nengo-cl NEFDoubleIntegrator.py [nperd seed]"
         sys.exit()
 
-    if sys.argv[1] == 'direct':
-        params['mode'] = SimulationMode.DIRECT
-    if len(sys.argv) >= 3:
-        params['nperd'] = int(sys.argv[2])
-    if len(sys.argv) == 4:
-        params['seed'] = int(sys.argv[3])
+    if len(sys.argv) >= 2:
+        params['nperd'] = int(sys.argv[1])
+    if len(sys.argv) == 3:
+        params['seed'] = int(sys.argv[2])
 
     dint = DoubleIntegrator(**params)
     dint.run()

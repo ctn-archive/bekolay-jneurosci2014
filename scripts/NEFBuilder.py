@@ -19,7 +19,7 @@ class BaseReactionTask(nef.FSMNode):
     The subject drinks for `t_drink` seconds.
     '''
     def __init__(self, name, t_foreperiod=1.0, t_timeout=2.0, t_response=0.6,
-                 t_tone=0.1, t_reward=1.0, t_iti=5.0):
+                 t_tone=0.1, t_reward=2.0, t_iti=5.0):
         self.reset()
         nef.FSMNode.__init__(self, name, 1)
 
