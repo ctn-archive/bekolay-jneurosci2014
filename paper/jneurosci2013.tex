@@ -35,15 +35,6 @@
 
 \pagestyle{plain}
 
-\newcommand{\scalefigone}[3]{
-  \begin{figure}[ht!]
-    % Requires \usepackage{graphicx}
-    \centering
-    \includegraphics[width=#2\columnwidth]{#1}
-    \caption{#3}
-    \label{#1}
-  \end{figure}}
-
 \setlength\fboxrule{1pt}
 \linespread{1.5}
 
@@ -74,7 +65,7 @@ Email: \url{celiasmith@uwaterloo.ca}.
 Centre for Theoretical Neuroscience, University of Waterloo.
 200 University Avenue West, Waterloo, ON, N2L 3G1.
 
-\textbf{Pages:} 32. \textbf{Figures:} 10. \textbf{Tables:} 2. \textbf{Multimedia, 3D models:} 0
+\textbf{Pages:} 27. \textbf{Figures:} 10. \textbf{Tables:} 2. \textbf{Multimedia, 3D models:} 0
 
 \textbf{Word counts:} Abstract: 199, Introduction: 486, Discussion: 1499.
 
@@ -232,7 +223,7 @@ and is penalized by a time-out with the house lights extinguished.
 If the lever is not released within the response window,
 the trial is classified as a ``late error,''
 and is also penalized by a time-out with the house lights extinguished.
-Figure~\ref{fig1}A presents a schematic view of the task.
+Figure~1A presents a schematic view of the task.
 
 Rats included in the study reached performance criterion
 of $> 60 \%$ correct trials in 9.75 $\pm$ 1.5 sessions
@@ -261,7 +252,7 @@ timeout~(TO), cue~(C), response window~(R),
 reward~(Rw) and intertrial interval~(ITI).
 State transitions can be seen in
 the graphical depiction of
-the finite state machine in Figure~\ref{fig1}C.
+the finite state machine in Figure~1C.
 
 The auditory cue, house lights, and reward signals
 are provided by the environment
@@ -368,14 +359,14 @@ We therefore use other inputs from
 the environment to match
 the trajectories tracked by
 the experimental principal components
-(shown in Figure~\ref{fig2}).
+(shown in Figure~2).
 
 Since the principal components
 resemble the double integrator network
 in the post-correct case,
 we aim to reset the system to the origin point
 after correct trials.
-Figure~\ref{fig2}D indicates that
+Figure~2D indicates that
 the principal components return to their
 original state after approximately 2 seconds,
 which is the time at which
@@ -399,7 +390,7 @@ is driven to the origin point.
 
 In the post-error case,
 the principal components
-in Figure~\ref{fig2}D are
+in Figure~2D are
 not at the origin point.
 Since the lever press increases $x_1$,
 when $x_1 > 0$ we can conclude that
@@ -421,7 +412,7 @@ Note that $x_2$ is not directly driven by $u_{TO}$;
 however, because of the $\beta x_1$ term,
 $x_2$ will also decrease.
 
-Finally, Figure~\ref{fig2}D shows that
+Finally, Figure~2D shows that
 the principal components are unstable
 during the intertrial interval.
 To model trial-by-trial cycles of
@@ -582,15 +573,13 @@ We construct spiking neural networks
 using the principles of the Neural Engineering Framework
 (NEF; \citenoparens{Eliasmith2003})
 in the Nengo simulation environment
-\cite{BekolayInpress}.\footnote{The Nengo scripts and simulation
-  package simulating the networks and their environment are available
-  at \url{https://github.com/tbekolay/jneurosci2013/releases/tag/2013-11-29}.}
+\cite{BekolayInpress}.
 Using the NEF, each signal
 from the dynamical systems above
 are represented with a population of spiking neurons,
 and transformed through the connections
 between those populations
-(see Figure~\ref{fig3}).
+(see Figure~3).
 
 The NEF enables the simulation of dynamical systems
 by making the assumption that populations of spiking neurons
@@ -776,7 +765,7 @@ The populations representing signals
 in the double integrator and control
 networks (see Sections~\ref{sec:dint} and \ref{sec:control})
 contained 1200 adaptive leaky integrate-and-fire neurons
-(see Figure~\ref{fig3});
+(see Figure~3);
 174 of the neurons in an analyzed population
 were randomly selected
 in order to match the number of units
@@ -811,7 +800,7 @@ over the sum of all squared eigenvalues
 ($s_i^2 / \sum s^2$).
 
 As previously described in \citetext{Narayanan2009}
-and summarized in Figure~\ref{fig2},
+and summarized in Figure~2,
 the first two principal components
 of the experimental data
 are modulated around the lever press
@@ -833,10 +822,10 @@ the first principal component
 is highly correlated with the integral
 (i.e., cumulative sum) of the second principal component
 during the post-correct trial
-(Figure~\ref{fig2}E).
+(Figure~2E).
 Since the first two principal components
 account for over half of the variance
-in the neural data (Figure~\ref{fig2}B),
+in the neural data (Figure~2B),
 we hypothesize that the mPFC
 represents the task state (PC1)
 and the integral of the task state (PC2).
@@ -851,7 +840,7 @@ taking place in the mPFC
 depends on prior outcomes.
 The firing patterns of individual neurons,
 related to the two leading PCs,
-are shown for post-correct trials in Figure~\ref{fig2}F.
+are shown for post-correct trials in Figure~2F.
 Nearly equal fractions of neurons
 became more or less active at times
 when the PCs were maximally positive or negative.
@@ -865,7 +854,7 @@ was given approximately 0.1 second later.
 The range of feedback times are indicated
 near the upper right corner of each plot.
 Importantly, the trials used for this analysis,
-and shown in Figure~\ref{fig2}, were all correct trials.
+and shown in Figure~2, were all correct trials.
 The only difference between trial types
 was the outcome of the previous trial
 (correct or incorrect).
@@ -923,18 +912,18 @@ of the high-dimensional neural simulation.
   \caption{Parameters used to simulate the dynamical system
     described in Equation~\eqref{eq:dint}.
     Appropriate values were found through simulation;
-    see Figure~\ref{fig4}.}
+    see Figure~4.}
   \label{tab:sim-param}
 \end{table}
 
 The purpose of the double integrator
 is to predict the time at which the cue occurs.
-Figure~\ref{fig4} shows that this is possible.
+Figure~4 shows that this is possible.
 The parameter $\beta$ controls how fast
 the second dimension of the double integrator state
 ($x_2$) increases (see Equation~\eqref{eq:dint}),
 resulting in different states at $t_c$
-(see Figure~\ref{fig4}B);
+(see Figure~4B);
 since this parameter is encoded in the strength
 of the connection between the two integrators,
 this is a natural target for learning
@@ -945,7 +934,7 @@ $t_c$, can be predicted given
 the initial conditions of the double integrator
 at the start of the trial;
 values at $t_c$ for $\beta=0.44$ are shown
-in Figure~\ref{fig4}A.
+in Figure~4A.
 
 The state of the system at the start of a trial
 (i.e., the initial conditions of the dynamical system)
@@ -954,17 +943,17 @@ Equation \eqref{eq:dint} describes how the state changes
 based on the two possible outcomes,
 reward or light extinguishing.
 For sufficiently high values of $R$
-(see Figure~\ref{fig4}C),
+(see Figure~4C),
 the system starts the next trial
 near the origin,
 resulting in the system predicting
 the time of the cue,
 and therefore employing the adaptive strategy.
 For sufficiently high values of $E$
-(see Figure~\ref{fig4}D),
+(see Figure~4D),
 the system starts the next trial near $(-1, -1)$,
 resulting in the system being unable to predict
-the time of the cue (see Figure~\ref{fig4}A),
+the time of the cue (see Figure~4A),
 and therefore employing the cue-responding strategy.
 Note that correct and error trials
 can be distinguished,
@@ -988,14 +977,14 @@ Table~\ref{tab:sim-param}.
 Equation~\eqref{eq:release} defines a signal
 that causes the network to release the lever
 when the predicted cue approaches.
-Figure~\ref{fig5} shows a representative
+Figure~5 shows a representative
 correct trial from the cue-responding
 and adaptive control networks,
 as well as a trial in which
 the cue was mispredicted,
 and the subsequent corrected trials
 following the error.
-Importantly, Figure~\ref{fig5}B
+Importantly, Figure~5B
 shows the adaptive control network
 can release the lever
 at the exact time of the cue.
@@ -1021,7 +1010,7 @@ exist to modify action timing,
 the signals used to drive learning
 in PRO can be computed from
 the double integrator model as well,
-as shown in Figure~\ref{fig6}.
+as shown in Figure~6.
 The only difference that cannot
 be attributed to the task
 is that the state is tracked throughout
@@ -1050,7 +1039,7 @@ to the recorded empirical data.
 
 \subsection{The spiking double integrator has the same principal components as experimental data}
 
-Figure~\ref{fig7} compares
+Figure~7 compares
 the two leading principal components
 of the spiking implementation of the double integrator network
 to those of the experimental data.
@@ -1070,7 +1059,7 @@ We also performed principal component analysis
 on neural populations representing only one
 of the two dimensions tracked by
 the double integrator network.
-Figure~\ref{fig8}
+Figure~8
 shows the results of the analysis
 for the population tracking $x_1$.
 While the first principal component
@@ -1086,7 +1075,7 @@ to both dimensions of the double integrator.
 
 \subsection{Spiking networks can predict the cue}
 
-Figure~\ref{fig9} shows that
+Figure~9 shows that
 the decoded values of spiking neural networks
 implementing the cue-responding
 and adaptive control networks
@@ -1103,11 +1092,11 @@ on the system state during a trial.
 The spiking networks are capable
 of the adaptive control described
 in the theoretical results,
-as can be seen in Figure~\ref{fig9}A.
+as can be seen in Figure~9A.
 
 \subsection{Adaptive control network matches observed performance}
 
-Figure~\ref{fig10} shows the performance
+Figure~10 shows the performance
 of the experimental subjects,
 the spiking cue-responding network,
 and the full spiking adaptive control network.
@@ -1150,7 +1139,7 @@ involved in model generation (see section~\ref{sec:nef}).
 This results in significant variability
 in the performance of simulated subjects,
 despite all but one performing the task well
-(see Figure~\ref{fig10}).
+(see Figure~10).
 Also notable is that the model
 does not employ learning:
 the weights determined
@@ -1183,7 +1172,7 @@ such as \citenoparens{Khamassi2012}).
 The PRO model proposes that the mPFC
 is involved in a form of
 temporal difference learning.
-As shown in Figure~\ref{fig6},
+As shown in Figure~6,
 the positive and negative reward prediction error
 computed by PRO can also be computed
 by the double integrator,
@@ -1384,7 +1373,7 @@ have been done.
 We have shown that neurons
 in mPFC are tuned to multiple aspects
 of the simple RT task
-(see Figures~\ref{fig7} and \ref{fig8}).
+(see Figures~7 and 8).
 Since we find neurons that are sensitive
 to both task state ($x_1$) and the
 length of time in that state ($x_2$),
@@ -1693,28 +1682,5 @@ the mean of all subjects' median reaction times
 (272$\pm$48ms for the experimental subjects,
 365$\pm$24ms for the cue-responding models,
 and 240$\pm$62ms for the adaptive control models).
-
-\clearpage
-\section{Figures}
-
-\scalefigone{fig1}{1.0}{}
-
-\scalefigone{fig2}{1.0}{}
-
-\scalefigone{fig3}{0.8}{}
-
-\scalefigone{fig4}{1.0}{}
-
-\scalefigone{fig5}{1.0}{}
-
-\scalefigone{fig6}{0.5}{}
-
-\scalefigone{fig7}{1.0}{}
-
-\scalefigone{fig8}{1.0}{}
-
-\scalefigone{fig9}{0.5}{}
-
-\scalefigone{fig10}{1.0}{}
 
 \end{document}
