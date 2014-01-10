@@ -46,7 +46,7 @@ def task_download_data():
         r = requests.get("http://api.figshare.com/v1/articles/" + article_id)
         detail = json.loads(r.content)
         for file_info in detail['items'][0]['files']:
-            outpath = os.path.join(files.simdata, file_info['name'])
+            outpath = os.path.join(files.data_sim, file_info['name'])
             if os.path.exists(outpath):
                 print outpath + " exists. Skipping."
                 continue
@@ -131,9 +131,9 @@ def task_combine():
     yield combine('fig4', ds_plot.fig4)
     yield combine('fig5', ds_plot.fig5)
     yield combine('fig6', ds_plot.fig6)
-    yield combine('fig8', dint_plot.fig7_8, 'dint')
-    yield combine('fig9', dint_plot.fig7_8, 'sint')
-    yield combine('fig7', ctrl_plot.fig9)
+    yield combine('fig7', dint_plot.fig7_8, 'dint')
+    yield combine('fig8', dint_plot.fig7_8, 'sint')
+    yield combine('fig9', ctrl_plot.fig9)
     yield combine('fig10', ctrl_plot.fig10)
 
 

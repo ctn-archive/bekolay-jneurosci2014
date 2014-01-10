@@ -56,7 +56,7 @@ def traj(pklf, tr):
     sd = d[tr + '_sig']
 
     plt.figure(1)
-    plt.grid()
+    # plt.grid()
     plt.axhline(0, color='0.2')
     plt.axvline(0, color='0.2')
     x, y = sd['signals'][2][2], sd['signals'][3][2]

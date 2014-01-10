@@ -127,7 +127,7 @@ def param(pklf, par):
 
     plt.subplot(2, 1, 2)
 
-    plt.grid()
+    # plt.grid()
     plt.axhline(0, color='0.2')
     plt.axvline(0, color='0.2')
     left = 0.0 if par == 'ics' else 1.0
