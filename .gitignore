@@ -22,3 +22,5 @@
 *.mat
 *.eps
 .ipynb_checkpoints
+*.zip
+
